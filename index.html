@@ -1,812 +1,550 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Venus Pipes & Tubes — Growth Trigger Report</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Knowledge Marine — Research Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root{
-  --bg:#04080f;--s1:#090e1a;--s2:#0d1320;--b1:#1a2338;--b2:#22304a;
-  --amber:#f0a500;--amber2:#ffbe2e;--green:#00c97a;--red:#e84545;
-  --blue:#4fc3f7;--purple:#bb86fc;--text:#dde5f5;--t2:#7e94b5;--t3:#4e6080;
-  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;--serif:'Playfair Display',serif;
-  --nav-h:58px;
-}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.55;overflow-x:hidden;padding-bottom:var(--nav-h)}
-
-/* HEADER */
-.hdr{background:var(--s1);border-bottom:1px solid var(--b2);padding:14px 16px;position:sticky;top:0;z-index:200;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.hdr-co{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--amber);text-transform:uppercase;margin-bottom:2px}
-.hdr-title{font-family:var(--serif);font-size:1.25rem;color:var(--text);line-height:1.2}
-.hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
-.hdr-price{font-family:var(--mono);font-size:1.1rem;font-weight:600;color:var(--amber2)}
-.hdr-chg{font-family:var(--mono);font-size:10px}
-.dn{color:var(--red)}.up{color:var(--green)}
-.hdr-meta{font-family:var(--mono);font-size:9px;color:var(--t3)}
-
-/* BOTTOM NAV */
-.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--b2);display:flex;height:var(--nav-h);z-index:200}
-.ntab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-family:var(--mono);font-size:8px;letter-spacing:.04em;color:var(--t3);border:none;background:none;cursor:pointer;padding:0;transition:color .15s}
-.ntab svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-.ntab.on{color:var(--amber)}.ntab.on svg{stroke:var(--amber)}
-
-/* PANELS */
-.panel{display:none;padding:14px 14px 24px;max-width:900px;margin:0 auto}
-.panel.on{display:block}
-
-/* KPIS */
-.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px}
-.kpi{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:13px 14px}
-.kpi-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.09em;color:var(--t3);text-transform:uppercase;margin-bottom:4px}
-.kpi-val{font-family:var(--mono);font-size:1.35rem;font-weight:600;color:var(--amber);line-height:1}
-.kpi-sub{font-size:10px;color:var(--t2);margin-top:3px}
-
-/* SECTION LABELS */
-.sec-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--amber);text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid var(--b1);margin-bottom:14px}
-.sec-lbl.mt{margin-top:24px}
-
-/* SNAPSHOT */
-.snapshot{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:14px;margin-bottom:18px}
-.snap-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.snap-item .sl{font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px}
-.snap-item .sv{font-family:var(--mono);font-size:12px;color:var(--text);font-weight:600}
-.sv.pos{color:var(--green)}.sv.neg{color:var(--red)}.sv.a{color:var(--amber2)}
-
-/* REVENUE BARS */
-.rev-chart{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:14px;margin-bottom:18px}
-.chart-title{font-size:12px;font-weight:500;color:var(--text);margin-bottom:3px}
-.chart-sub{font-family:var(--mono);font-size:9px;color:var(--t3);margin-bottom:14px}
-.bars{display:flex;align-items:flex-end;gap:6px;height:110px;padding:0 4px}
-.bar-grp{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
-.bar-wrap{width:100%;display:flex;align-items:flex-end;justify-content:center;gap:2px;flex:1}
-.bar{border-radius:3px 3px 0 0;min-height:3px}
-.bar-yr{font-family:var(--mono);font-size:8px;color:var(--t3)}
-.chart-legend{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap}
-.cleg{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;color:var(--t2)}
-.cleg-dot{width:8px;height:8px;border-radius:2px}
-
-/* SEGMENT MIX */
-.seg-mix{display:flex;flex-direction:column;gap:7px;margin-bottom:18px}
-.seg-row{display:flex;align-items:center;gap:8px}
-.seg-lbl{font-size:11px;color:var(--t2);width:130px;flex-shrink:0}
-.seg-track{flex:1;height:16px;background:var(--b1);border-radius:3px;overflow:hidden}
-.seg-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:6px;font-family:var(--mono);font-size:9px;font-weight:600;color:rgba(0,0,0,.75)}
-.seg-pct{font-family:var(--mono);font-size:9px;color:var(--t2);width:36px;text-align:right;flex-shrink:0}
-
-/* TRIGGER CARDS */
-.trigger-cards{display:flex;flex-direction:column;gap:12px}
-.tc{background:var(--s1);border:1px solid var(--b1);border-radius:10px;overflow:hidden}
-.tc-head{padding:13px 14px;cursor:pointer;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.tc-num{font-family:var(--mono);font-size:9px;color:var(--t3);background:var(--s2);border:1px solid var(--b2);padding:2px 7px;border-radius:3px;white-space:nowrap;flex-shrink:0;margin-top:2px}
-.tc-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.35;flex:1}
-.tc-badge{font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 7px;border-radius:3px;border:1px solid;white-space:nowrap;flex-shrink:0}
-.bHC{background:rgba(0,201,122,.1);border-color:rgba(0,201,122,.3);color:var(--green)}
-.bMC{background:rgba(240,165,0,.1);border-color:rgba(240,165,0,.3);color:var(--amber)}
-.bOP{background:rgba(187,134,252,.1);border-color:rgba(187,134,252,.3);color:var(--purple)}
-.chev{color:var(--t3);font-size:14px;transition:transform .2s;flex-shrink:0;margin-top:2px}
-.tc.open .chev{transform:rotate(180deg)}
-.tc-body{display:none;padding:0 14px 15px}
-.tc.open .tc-body{display:block}
-.tc-desc{font-size:12px;color:var(--text);line-height:1.65;margin-bottom:13px}
-.tc-desc strong{color:var(--amber2)}
-.tc-data{display:grid;grid-template-columns:1fr;gap:8px}
-.td-box{background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:10px 12px}
-.td-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--t3);text-transform:uppercase;margin-bottom:5px}
-.td-val{font-size:12px;color:var(--text);line-height:1.5}
-.td-val em{color:var(--amber2);font-style:normal}
-.td-val .q{font-style:italic;color:var(--t2);border-left:2px solid var(--b2);padding-left:8px;display:block;margin-top:4px;font-size:11px;line-height:1.5}
-
-/* RISKS */
-.risk-block{background:rgba(232,69,69,.06);border:1px solid rgba(232,69,69,.2);border-radius:8px;padding:13px 14px;margin-top:14px}
-.risk-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--red);text-transform:uppercase;margin-bottom:7px}
-.risk-item{display:flex;gap:9px;margin-bottom:8px;font-size:12px;line-height:1.5}
-.risk-item:last-child{margin:0}
-.risk-dot{width:5px;height:5px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:6px}
-.priced-block{background:rgba(79,195,247,.06);border:1px solid rgba(79,195,247,.18);border-radius:8px;padding:13px 14px;margin-top:14px}
-.priced-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--blue);text-transform:uppercase;margin-bottom:7px}
-.priced-item{display:flex;gap:9px;margin-bottom:6px;font-size:12px;line-height:1.5}
-.priced-item:last-child{margin:0}
-.p-dot{width:5px;height:5px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:6px}
-
-/* SCORECARD TABLE */
-.score-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:11px}
-.score-table th{background:var(--s2);font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.06em;color:var(--t2);padding:8px 10px;text-align:left;border-bottom:1px solid var(--b2)}
-.score-table td{padding:8px 10px;border-bottom:1px solid var(--b1);vertical-align:middle;font-family:var(--mono);font-size:10px}
-.score-table tr:last-child td{border:none}
-.score-table tr:hover td{background:var(--s2)}
-.conf-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
-.cd-h{background:var(--green)}.cd-m{background:var(--amber)}.cd-p{background:var(--purple)}
-
-/* FIN ROW */
-.fin-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.fin-box{background:var(--s1);border:1px solid var(--b1);border-radius:8px;padding:12px 13px}
-.fin-lbl{font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
-.fin-val{font-family:var(--mono);font-size:1.1rem;font-weight:600;color:var(--amber)}
-.fin-sub{font-size:10px;color:var(--t2);margin-top:2px}
-
-/* VALUATION */
-.val-intro{background:rgba(240,165,0,.05);border:1px solid rgba(240,165,0,.15);border-radius:8px;padding:13px 14px;margin-bottom:18px;font-size:12px;color:var(--t2);line-height:1.65}
-.val-intro strong{color:var(--amber2)}
-.peer-wrap{overflow-x:auto;margin-bottom:18px;border-radius:8px;border:1px solid var(--b2)}
-.peer-table{width:100%;border-collapse:collapse;min-width:560px;font-size:11px}
-.peer-table thead th{background:var(--s2);font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.07em;color:var(--t2);padding:9px 11px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--b2)}
-.peer-table thead th:first-child{text-align:left}
-.peer-table tbody td{padding:9px 11px;border-bottom:1px solid var(--b1);font-family:var(--mono);font-size:10px;text-align:right;color:var(--t2);vertical-align:middle}
-.peer-table tbody td:first-child{text-align:left;color:var(--text);font-size:11px}
-.peer-table tbody tr:last-child td{border:none}
-.peer-table tbody tr.vp-row td{background:rgba(240,165,0,.04)}
-.peer-table tbody tr.vp-row td:first-child{color:var(--amber2);font-weight:600}
-.peer-table tbody tr:hover td{background:var(--s2)}
-.val-hi{color:var(--green);font-weight:600}.val-lo{color:var(--red)}.val-mid{color:var(--amber)}.val-na{color:var(--t3)}
-.pe-band-wrap{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:14px;margin-bottom:14px}
-.pe-band-title{font-size:12px;font-weight:500;color:var(--text);margin-bottom:3px}
-.pe-band-sub{font-family:var(--mono);font-size:9px;color:var(--t3);margin-bottom:14px}
-.pe-track{position:relative;height:28px;background:var(--b1);border-radius:6px;margin-bottom:8px}
-.pe-range{position:absolute;top:0;height:100%;border-radius:6px;background:linear-gradient(90deg,rgba(232,69,69,.2),rgba(240,165,0,.2),rgba(0,201,122,.2))}
-.pe-marker{position:absolute;top:-4px;width:3px;height:36px;border-radius:2px}
-.pe-m-avg{background:var(--amber);opacity:.8}.pe-m-cur{background:var(--blue)}
-.pe-labels{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--t3)}
-.pe-legend{display:flex;gap:14px;margin-top:10px;flex-wrap:wrap}
-.pe-leg{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;color:var(--t2)}
-.pe-leg-dot{width:10px;height:4px;border-radius:2px}
-.scenarios{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
-.sc-box{border-radius:10px;padding:13px 14px;border:1px solid}
-.sc-bear{background:rgba(232,69,69,.06);border-color:rgba(232,69,69,.2)}
-.sc-base{background:rgba(240,165,0,.07);border-color:rgba(240,165,0,.25)}
-.sc-bull{background:rgba(0,201,122,.06);border-color:rgba(0,201,122,.2)}
-.sc-lbl{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.09em;margin-bottom:6px}
-.sc-bear .sc-lbl{color:var(--red)}.sc-base .sc-lbl{color:var(--amber)}.sc-bull .sc-lbl{color:var(--green)}
-.sc-price{font-family:var(--mono);font-size:1.2rem;font-weight:600;line-height:1;margin-bottom:4px}
-.sc-bear .sc-price{color:var(--red)}.sc-base .sc-price{color:var(--amber)}.sc-bull .sc-price{color:var(--green)}
-.sc-detail{font-size:10px;color:var(--t2);line-height:1.5}
-.peg-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
-.peg-box{background:var(--s1);border:1px solid var(--b1);border-radius:8px;padding:12px 13px}
-.peg-lbl{font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
-.peg-val{font-family:var(--mono);font-size:1.1rem;font-weight:600}
-.peg-sub{font-size:10px;color:var(--t2);margin-top:3px;line-height:1.4}
-.sector-box{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:14px;margin-bottom:14px}
-.sector-title{font-size:12px;font-weight:600;color:var(--amber2);margin-bottom:10px}
-.sector-row{display:flex;gap:8px;margin-bottom:7px;font-size:12px;line-height:1.5}
-.sector-row:last-child{margin:0}
-.sector-icon{flex-shrink:0;color:var(--amber);margin-top:1px}
-
-/* DESKTOP */
-@media(min-width:640px){
-  .panel{padding:20px 24px 28px}
-  .kpis{grid-template-columns:repeat(4,1fr)}
-  .snap-grid{grid-template-columns:repeat(3,1fr)}
-  .tc-data{grid-template-columns:1fr 1fr}
-  .fin-row{grid-template-columns:repeat(4,1fr)}
-  .peg-row{grid-template-columns:repeat(4,1fr)}
-}
-@media(min-width:900px){
-  body{padding-bottom:0}
-  .bnav{display:none}
-  .top-tabs-wrap{display:block!important}
-  .top-tabs{display:flex;background:var(--s1);border-bottom:1px solid var(--b2);max-width:900px;margin:0 auto;padding:0 24px;position:sticky;top:64px;z-index:150}
-  .ttab{padding:11px 16px;font-family:var(--mono);font-size:10px;letter-spacing:.07em;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
-  .ttab:hover{color:var(--t2)}.ttab.on{color:var(--amber);border-bottom-color:var(--amber)}
-  .scenarios{grid-template-columns:repeat(3,1fr)}
-}
-.top-tabs-wrap{display:none}
-@media(max-width:480px){.scenarios{grid-template-columns:1fr}}
+:root{--navy:#0F1F3D;--orange:#E8701A;--green:#16A34A;--red:#DC2626;--amber:#D97706;--blue:#1D4ED8;--bg:#F8F9FC;--card:#FFFFFF;--cb:#E2E8F0;--text:#1A202C;--muted:#64748B;--sec:#374151;--nav:#0F1F3D;--thr:#F1F5F9;--alt:#F8FAFC;--hi:#FFF7ED;--dis:#FFFBEB;--sep:#E2E8F0;--sh:0 1px 3px rgba(0,0,0,.07)}
+[data-theme="dark"]{--bg:#0F172A;--card:#1E293B;--cb:#334155;--text:#F1F5F9;--muted:#94A3B8;--sec:#CBD5E1;--nav:#0D1B2A;--thr:#1E293B;--alt:#162032;--hi:#2D1F0A;--dis:#1C1400;--sep:#334155;--orange:#F09030;--sh:0 1px 3px rgba(0,0,0,.3)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;font-size:16px;line-height:1.6;background:var(--bg);color:var(--text);transition:background .2s,color .2s}
+.nav{position:sticky;top:0;z-index:100;background:var(--nav);box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.nav-top{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+.nb{color:#fff;font-weight:700;font-size:14px}.nb span{color:var(--orange)}
+.dtgl{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:4px 12px;border-radius:20px;cursor:pointer;font-size:12px}
+.nav-tabs{display:flex;overflow-x:auto;scrollbar-width:none;padding:0 8px}.nav-tabs::-webkit-scrollbar{display:none}
+.tb{flex-shrink:0;background:none;border:none;color:rgba(255,255,255,.6);padding:9px 12px;cursor:pointer;font-size:11px;font-weight:600;letter-spacing:.06em;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;text-transform:uppercase}
+.tb:hover{color:#fff}.tb.active{color:var(--orange);border-bottom-color:var(--orange)}
+.tp{display:none}.tp.active{display:block}
+.c{max-width:1280px;margin:0 auto;padding:22px 18px}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px}
+.g5{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--cb);border-radius:10px;padding:18px;box-shadow:var(--sh)}
+.kpi{background:var(--card);border:1px solid var(--cb);border-radius:10px;padding:14px 16px;text-align:center;box-shadow:var(--sh)}
+.kl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.kv{font-size:22px;font-weight:700;font-family:'Courier New',monospace;margin:4px 0}
+.ks{font-size:12px;color:var(--muted)}
+.sh{display:block;margin:5px auto 0}
+.sec{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--orange);font-weight:700;padding-left:10px;border-left:4px solid var(--orange);border-bottom:1px solid var(--sep);padding-bottom:7px;margin:22px 0 14px}
+.sec:first-child{margin-top:0}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.bh{background:#FEE2E2;color:#DC2626}.bm{background:#FEF3C7;color:#D97706}.bl{background:#DCFCE7;color:#16A34A}.bo{background:#DBEAFE;color:#1D4ED8}
+.bacc{background:#FFF7ED;color:#E8701A;font-size:13px;padding:5px 16px}.bbuy{background:#DCFCE7;color:#16A34A;font-size:13px;padding:5px 16px}
+[data-theme="dark"] .bh{background:#450A0A;color:#FCA5A5}[data-theme="dark"] .bm{background:#451A00;color:#FCD34D}
+[data-theme="dark"] .bl{background:#052E16;color:#86EFAC}[data-theme="dark"] .bo{background:#1E3A5F;color:#93C5FD}
+[data-theme="dark"] .bacc{background:#3D1A00;color:#FDBA74}[data-theme="dark"] .bbuy{background:#052E16;color:#86EFAC}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{background:var(--thr);color:var(--sec);font-size:11px;text-transform:uppercase;letter-spacing:.05em;padding:9px 13px;text-align:left;border-bottom:2px solid var(--sep);white-space:nowrap}
+td{padding:9px 13px;border-bottom:1px solid var(--sep);color:var(--text);vertical-align:top}
+tr:nth-child(even) td{background:var(--alt)}
+.tdhi{background:var(--hi)!important;font-weight:600}
+.mono{font-family:'Courier New',monospace}
+.vb{background:linear-gradient(135deg,#0F1F3D,#1a3a6b);border-radius:12px;padding:26px;color:#fff;margin-bottom:18px}
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:12px;margin-top:12px}
+.sbear{background:#FEE2E2;border:1px solid #FCA5A5;border-radius:10px;padding:14px;text-align:center}
+.sbase{background:#FFF7ED;border:1px solid #FDBA74;border-radius:10px;padding:14px;text-align:center}
+.sbull{background:#DCFCE7;border:1px solid #86EFAC;border-radius:10px;padding:14px;text-align:center}
+[data-theme="dark"] .sbear{background:#450A0A;border-color:#7F1D1D}[data-theme="dark"] .sbase{background:#3D1A00;border-color:#78350F}[data-theme="dark"] .sbull{background:#052E16;border-color:#14532D}
+.tc{border-left:4px solid;border-radius:8px;padding:14px;margin-bottom:11px;background:var(--card);box-shadow:var(--sh)}
+.tc.hi{border-color:var(--red)}.tc.med{border-color:var(--amber)}.tc.opt{border-color:var(--blue)}
+.tl{position:relative;padding-left:22px}.tl::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:var(--sep)}
+.ti{position:relative;margin-bottom:18px}.td2{position:absolute;left:-18px;top:4px;width:11px;height:11px;border-radius:50%;background:var(--orange)}
+.tdate{font-size:12px;color:var(--muted);font-weight:600}.ttl{font-weight:600;font-size:14px;margin:2px 0}.tbody{font-size:13px;color:var(--sec)}
+.cw{position:relative;width:100%}
+.db{background:var(--dis);border-top:3px solid #D97706;padding:11px 18px;font-size:12px;color:var(--amber);text-align:center;margin-top:36px}
+.cc{border-radius:10px;border:1px solid var(--cb);background:var(--card);padding:18px;margin-bottom:14px}
+.hg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;max-width:230px}
+.hc{padding:8px;border-radius:4px;text-align:center;font-size:11px;font-weight:700}
+.hl{background:#DCFCE7;color:#166534}.hm{background:#FEF3C7;color:#92400E}.hhi{background:#FEE2E2;color:#991B1B}
+[data-theme="dark"] .hl{background:#052E16;color:#86EFAC}[data-theme="dark"] .hm{background:#451A00;color:#FCD34D}[data-theme="dark"] .hhi{background:#450A0A;color:#FCA5A5}
+.ir{display:flex;gap:8px;padding:8px;border-radius:6px;margin-bottom:6px}
+@media print{.nav,.dtgl,.nav-tabs{display:none!important}body{background:white!important}.tp{display:block!important}}
 </style>
 </head>
 <body>
+<nav class="nav">
+<div class="nav-top"><div class="nb">Knowledge Marine &amp; Engineering Works &nbsp;<span>NSE: KMEW | BSE: 543273</span></div><button class="dtgl" onclick="toggleTheme()">☀/☾</button></div>
+<div class="nav-tabs">
+<button class="tb active" onclick="showTab(0)">Exec Summary</button>
+<button class="tb" onclick="showTab(1)">Overview</button>
+<button class="tb" onclick="showTab(2)">Business</button>
+<button class="tb" onclick="showTab(3)">Industry</button>
+<button class="tb" onclick="showTab(4)">Financials</button>
+<button class="tb" onclick="showTab(5)">Growth</button>
+<button class="tb" onclick="showTab(6)">Forensics</button>
+<button class="tb" onclick="showTab(7)">Valuation</button>
+<button class="tb" onclick="showTab(8)">Thesis</button>
+<button class="tb" onclick="showTab(9)">Risks</button>
+<button class="tb" onclick="showTab(10)">Concall</button>
+<button class="tb" onclick="showTab(11)">Cap. Alloc.</button>
+<button class="tb" onclick="showTab(12)">Ownership</button>
+<button class="tb" onclick="showTab(13)">Events</button>
+</div></nav>
 
-<!-- HEADER -->
-<div class="hdr">
-  <div>
-    <div class="hdr-co">NSE · VENUSPIPES · Stainless Steel Pipes & Tubes</div>
-    <div class="hdr-title">Venus Pipes & Tubes</div>
-  </div>
-  <div class="hdr-right">
-    <div class="hdr-price">₹1,132</div>
-    <div class="hdr-chg dn">▼ 32% from 52W high</div>
-    <div class="hdr-meta">MCap ₹2,345 Cr · PE 23.4x</div>
-  </div>
+<!-- TAB 0: EXEC SUMMARY -->
+<div id="tab-0" class="tp active"><div class="c">
+<div class="vb">
+<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:12px;">
+<span class="bbuy" style="font-size:15px;padding:8px 22px;border-radius:30px;">BUY</span>
+<div><div style="font-size:12px;opacity:.7;text-transform:uppercase;">Conviction</div><div style="font-size:30px;font-weight:800;font-family:'Courier New',monospace;color:#86EFAC;">8 / 10</div></div>
+<div style="margin-left:auto;text-align:right;"><div style="font-size:11px;opacity:.7;">CMP (Apr 22, 2026)</div><div style="font-size:28px;font-weight:800;font-family:'Courier New',monospace;">&#8377;1,740</div><div style="font-size:11px;opacity:.7;">Mkt Cap ~&#8377;4,100 Cr | 52W: &#8377;632&#8211;&#8377;1,965</div></div>
 </div>
-
-<!-- DESKTOP TOP TABS -->
-<div class="top-tabs-wrap">
-  <div class="top-tabs">
-    <div class="ttab on" onclick="sw('snapshot',this)">Snapshot</div>
-    <div class="ttab" onclick="sw('triggers',this)">Growth Triggers</div>
-    <div class="ttab" onclick="sw('priced',this)">Priced In & Risks</div>
-    <div class="ttab" onclick="sw('scorecard',this)">Scorecard</div>
-    <div class="ttab" onclick="sw('valuation',this)">Valuation</div>
-  </div>
+<p style="font-size:14px;line-height:1.75;opacity:.9;">Knowledge Marine &amp; Engineering Works (KMEW) is India's fastest-growing marine infrastructure company &mdash; a decade-old company that has compounded revenue at 53% CAGR over 5 years and profit at 61% CAGR, yet trades at a meaningful discount to what its growth profile would command in any other sector. The Q3 FY26 inflection is significant: revenue jumped 56% YoY to &#8377;90 Cr (vs &#8377;48-52 Cr in recent quarters) driven by shipbuilding entry, a &#8377;1,500 Cr order book, &#8377;3,000 Cr+ bid pipeline, and a near-zero effective tax rate from a tonnage tax election. FII entry to 11% in Dec 2025 validates institutional conviction. BUY for a 2-year target of &#8377;2,800 on order book execution; near-term 12-month target &#8377;2,200.</p>
 </div>
-
-<!-- ═══════ PANEL 1: SNAPSHOT ═══════ -->
-<div id="p-snapshot" class="panel on">
-
-  <div class="kpis">
-    <div class="kpi"><div class="kpi-lbl">Q3 FY26 Revenue</div><div class="kpi-val">₹297 Cr</div><div class="kpi-sub">+28.3% YoY · All-time high</div></div>
-    <div class="kpi"><div class="kpi-lbl">Q3 FY26 PAT</div><div class="kpi-val">₹25.6 Cr</div><div class="kpi-sub">+42.5% YoY</div></div>
-    <div class="kpi"><div class="kpi-lbl">Order Book</div><div class="kpi-val">₹470 Cr</div><div class="kpi-sub">+34% YoY vs ₹350 Cr</div></div>
-    <div class="kpi"><div class="kpi-lbl">EBITDA Margin</div><div class="kpi-val">16.4%</div><div class="kpi-sub">Target 16–18% by FY27</div></div>
-  </div>
-
-  <!-- Revenue & PAT chart -->
-  <div class="rev-chart">
-    <div class="chart-title">Revenue & PAT Trend (₹ Cr)</div>
-    <div class="chart-sub">Standalone · FY22–FY25 · 9M FY26</div>
-    <div class="bars">
-      <div class="bar-grp">
-        <div class="bar-wrap">
-          <div class="bar" style="width:42%;height:16px;background:#185fa5" title="Rev ₹162 Cr"></div>
-          <div class="bar" style="width:42%;height:20px;background:var(--green)" title="PAT ₹32 Cr"></div>
-        </div><div class="bar-yr">FY22</div>
-      </div>
-      <div class="bar-grp">
-        <div class="bar-wrap">
-          <div class="bar" style="width:42%;height:54px;background:#185fa5" title="Rev ₹552 Cr"></div>
-          <div class="bar" style="width:42%;height:28px;background:var(--green)" title="PAT ₹44 Cr"></div>
-        </div><div class="bar-yr">FY23</div>
-      </div>
-      <div class="bar-grp">
-        <div class="bar-wrap">
-          <div class="bar" style="width:42%;height:72px;background:#185fa5" title="Rev ₹731 Cr"></div>
-          <div class="bar" style="width:42%;height:56px;background:var(--green)" title="PAT ₹75 Cr"></div>
-        </div><div class="bar-yr">FY24</div>
-      </div>
-      <div class="bar-grp">
-        <div class="bar-wrap">
-          <div class="bar" style="width:42%;height:90px;background:#185fa5" title="Rev ₹917 Cr"></div>
-          <div class="bar" style="width:42%;height:64px;background:var(--green)" title="PAT ₹92 Cr"></div>
-        </div><div class="bar-yr">FY25</div>
-      </div>
-      <div class="bar-grp">
-        <div class="bar-wrap">
-          <div class="bar" style="width:42%;height:84px;background:rgba(24,95,165,.5)" title="9M FY26 ₹864 Cr"></div>
-          <div class="bar" style="width:42%;height:60px;background:rgba(0,201,122,.4)" title="9M PAT ₹77 Cr"></div>
-        </div><div class="bar-yr">9M FY26</div>
-      </div>
-    </div>
-    <div class="chart-legend">
-      <span class="cleg"><span class="cleg-dot" style="background:#185fa5"></span>Revenue</span>
-      <span class="cleg"><span class="cleg-dot" style="background:var(--green)"></span>PAT</span>
-      <span class="cleg"><span class="cleg-dot" style="background:rgba(24,95,165,.4)"></span>9M FY26 (partial)</span>
-    </div>
-  </div>
-
-  <!-- Product mix -->
-  <div class="sec-lbl">Product & Revenue Mix — Q3 FY26</div>
-  <div class="seg-mix">
-    <div class="seg-row"><span class="seg-lbl">Seamless Pipes</span><div class="seg-track"><div class="seg-fill" style="width:61%;background:var(--amber)">61%</div></div><span class="seg-pct">₹181 Cr</span></div>
-    <div class="seg-row"><span class="seg-lbl">Welded Pipes</span><div class="seg-track"><div class="seg-fill" style="width:34%;background:#185fa5">34%</div></div><span class="seg-pct">₹101 Cr</span></div>
-    <div class="seg-row"><span class="seg-lbl">Other/Fittings</span><div class="seg-track"><div class="seg-fill" style="width:5%;background:#3a3a5a">5%</div></div><span class="seg-pct">~₹15 Cr</span></div>
-    <div class="seg-row"><span class="seg-lbl" style="color:var(--amber2)">Exports (share)</span><div class="seg-track"><div class="seg-fill" style="width:32%;background:rgba(0,201,122,.7)">32%</div></div><span class="seg-pct">₹95 Cr</span></div>
-    <div class="seg-row"><span class="seg-lbl" style="color:var(--t2)">Domestic (share)</span><div class="seg-track"><div class="seg-fill" style="width:68%;background:rgba(79,195,247,.5)">68%</div></div><span class="seg-pct">₹202 Cr</span></div>
-  </div>
-
-  <!-- Company Snapshot -->
-  <div class="sec-lbl">Company Snapshot</div>
-  <div class="snapshot">
-    <div class="snap-grid">
-      <div class="snap-item"><div class="sl">MCap</div><div class="sv a">₹2,345 Cr</div></div>
-      <div class="snap-item"><div class="sl">CMP (8-Apr-26)</div><div class="sv">₹1,132</div></div>
-      <div class="snap-item"><div class="sl">52W Range</div><div class="sv">₹968 – ₹1,660</div></div>
-      <div class="snap-item"><div class="sl">PE (TTM)</div><div class="sv">23.4x</div></div>
-      <div class="snap-item"><div class="sl">P/B</div><div class="sv">3.7x</div></div>
-      <div class="snap-item"><div class="sl">Revenue FY25</div><div class="sv pos">₹917 Cr</div></div>
-      <div class="snap-item"><div class="sl">PAT FY25</div><div class="sv pos">₹92 Cr</div></div>
-      <div class="snap-item"><div class="sl">EBITDA Margin</div><div class="sv">16.4%</div></div>
-      <div class="snap-item"><div class="sl">Promoter Hold.</div><div class="sv">48.4%</div></div>
-      <div class="snap-item"><div class="sl">Order Book</div><div class="sv a">₹470 Cr</div></div>
-      <div class="snap-item"><div class="sl">Export Share</div><div class="sv">32% Q3 FY26</div></div>
-      <div class="snap-item"><div class="sl">Capacity (SS)</div><div class="sv">~36,000 TPA+</div></div>
-    </div>
-  </div>
-
-  <!-- Sector context note -->
-  <div style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--t2);line-height:1.6">
-    <span style="font-family:var(--mono);font-size:9px;color:var(--amber);text-transform:uppercase;letter-spacing:.09em;display:block;margin-bottom:5px">Business in Brief</span>
-    Venus Pipes & Tubes (est. 2015, Dhaneti, Gujarat) is one of India's few integrated stainless steel seamless and welded pipe manufacturers. Its Kutch facility — 50–70 km from Mundra and Kandla Ports — gives it logistical advantage for exports. The company serves chemicals, pharma, power, oil & gas, food processing, and engineering industries. It is now expanding into fittings (PFF — Piping, Fittings & Flanges) and titanium tubes, targeting premium/niche segments where competition is thin.
-  </div>
-
+<div class="g5" style="margin-bottom:18px;">
+<div class="kpi"><div class="kl">CMP</div><div class="kv">&#8377;1,740</div><div class="ks">52W: &#8377;632&#8211;&#8377;1,965</div><svg class="sh" width="80" height="26"><polyline points="0,24 13,20 26,16 39,12 52,8 65,10 80,6" fill="none" stroke="#16A34A" stroke-width="2"/></svg></div>
+<div class="kpi"><div class="kl">Mkt Cap</div><div class="kv" style="font-size:18px;">&#8377;4,100 Cr</div><div class="ks">Small Cap</div><svg class="sh" width="80" height="26"><polyline points="0,22 13,18 26,14 39,12 52,8 65,6 80,4" fill="none" stroke="#16A34A" stroke-width="2"/></svg></div>
+<div class="kpi"><div class="kl">PE (TTM)</div><div class="kv">61x</div><div class="ks">EPS TTM &#8377;27.9</div><svg class="sh" width="80" height="26"><polyline points="0,20 13,22 26,16 39,18 52,14 65,12 80,10" fill="none" stroke="#E8701A" stroke-width="2"/></svg></div>
+<div class="kpi"><div class="kl">ROE (FY25)</div><div class="kv">25.8%</div><div class="ks">ROCE: 24.7%</div><svg class="sh" width="80" height="26"><polyline points="0,22 13,20 26,18 39,16 52,14 65,12 80,10" fill="none" stroke="#16A34A" stroke-width="2"/></svg></div>
+<div class="kpi"><div class="kl">Order Book</div><div class="kv" style="font-size:18px;">&#8377;1,500 Cr</div><div class="ks">Bids &gt;&#8377;3,000 Cr</div><svg class="sh" width="80" height="26"><polyline points="0,24 13,20 26,18 39,14 52,10 65,8 80,5" fill="none" stroke="#16A34A" stroke-width="2"/></svg></div>
 </div>
-
-<!-- ═══════ PANEL 2: TRIGGERS ═══════ -->
-<div id="p-triggers" class="panel">
-  <div class="sec-lbl">Growth Triggers (6 Identified)</div>
-  <div class="trigger-cards">
-
-    <!-- T1 -->
-    <div class="tc" id="tc1">
-      <div class="tc-head" onclick="toggleTc('tc1')">
-        <span class="tc-num">T-1</span>
-        <div style="flex:1;padding:0 8px"><div class="tc-title">Fittings Plant Live — Completes the PFF Bundle, Unlocks Cross-Sell</div></div>
-        <span class="tc-badge bHC">HIGH CONVICTION</span>
-        <span class="chev">▾</span>
-      </div>
-      <div class="tc-body">
-        <div class="tc-desc">Venus commissioned fittings capacity in <strong>Q4 FY26 (Mar-2026)</strong> — the last piece of its PFF (Piping, Fittings & Flanges) strategy. Every existing pipe customer is now a potential fittings customer. The company already has the relationships; it's adding the product. Management (Q2 FY26 concall): <strong>"The person who is currently procuring pipes would be the same customer procuring fittings. It becomes more sensible for them."</strong> This is a pure revenue add with near-zero new customer acquisition cost. Fittings carry higher margins than standard welded pipes, making this an EBITDA margin expansion play as well as a revenue lever.</div>
-        <div class="tc-data">
-          <div class="td-box">
-            <div class="td-lbl">Concall Quote (Q2 FY26 — Nov 2025)</div>
-            <div class="td-val"><span class="q">"The fitting would be definitely a new business for us, so it will take a bit of time to ramp it up. We'll do a portion of trading also on the side of fittings just to know how the market plays. The person currently procuring pipes would be the same customer procuring fittings — it becomes more sensible for them." — MD Arun Kothari</span></div>
-          </div>
-          <div class="td-box">
-            <div class="td-lbl">Margin Trajectory</div>
-            <div class="td-val">EBITDA margin Q3 FY26: <em>16.4%</em>. Management guiding <em>16–18% by FY27</em> — the incremental 150–360 bps is expected to come primarily from fittings and value-added products like titanium tubes. Fittings globally carry 20–25% EBITDA margins vs 14–16% for commodity welded pipes. [Source: Monarch Networth BUY note Feb-2026; Q3 FY26 Concall 5-Feb-2026]</div>
-          </div>
-          <div class="td-box">
-            <div class="td-lbl">Capex & Commissioning</div>
-            <div class="td-val">Total capex plan: <em>₹175 Cr</em> across two phases. Phase 1 (₹115 Cr): fittings + value-added welded tubes — completed. Phase 2 (₹60 Cr): seamless capacity expansion — in progress. Fittings plant targeted <em>Q4 FY26 commissioning</em>. Initial contribution minimal in FY26; meaningful revenue from <em>FY27 Q2 onwards</em> as approvals come in. [Source: BSE Filing; Q2 FY26 Concall]</div>
-          </div>
-          <div class="td-box">
-            <div class="td-lbl">Market Size</div>
-            <div class="td-val">India's stainless steel fittings market is fragmented — mostly imports and small unorganised players. Venus's ability to offer pipes + fittings together from a single ISO-certified manufacturer in Gujarat = significant import substitution opportunity. Sectors like oil & gas, pharma, and nuclear increasingly prefer domestic approved vendors. [Source: Company website; Tube & Pipe India interview, 2024]</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- T2 -->
-    <div class="tc" id="tc2">
-      <div class="tc-head" onclick="toggleTc('tc2')">
-        <span class="tc-num">T-2</span>
-        <div style="flex:1;padding:0 8px"><div class="tc-title">Seamless Capacity Ramp — 1,800 MTPA New, Boiler Tube Order 40% Executed</div></div>
-        <span class="tc-badge bHC">HIGH CONVICTION</span>
-        <span class="chev">▾</span>
-      </div>
-      <div class="tc-body">
-        <div class="tc-desc">Venus commissioned approximately <strong>1,800 MTPA of new seamless pipe capacity</strong> raising total seamless capacity to ~16,200 MTPA annually. Seamless pipes are the higher-margin, higher-barrier product — Q3 FY26 seamless revenue grew <strong>+43.5% YoY to ₹181 Cr</strong>, now 61% of total revenue. A landmark <strong>₹190 Cr boiler tube order for a thermal power project</strong> is 40% executed with completion by Jun-2026. New capacity is already being absorbed by existing demand.</div>
-        <div class="tc-data">
-          <div class="td-box">
-            <div class="td-lbl">Capacity Ramp Numbers</div>
-            <div class="td-val">New seamless capacity: <em>~1,800 MTPA</em>. Total seamless: <em>~16,200 MTPA</em>. Seamless revenue share: Q3 FY25 was ~52%; Q3 FY26 is <em>61%</em> — mix shift in progress. Seamless EBITDA margin: ~18–20% vs 14–15% for welded. Approvals already received for faster ramp vs fittings. [Source: Monarch Networth Note Feb-2026; Alpha Spread Q3 FY26 summary]</div>
-          </div>
-          <div class="td-box">
-            <div class="td-lbl">Power Sector Order — ₹190 Cr</div>
-            <div class="td-val">Stainless Steel Seamless Boiler Tubes for thermal power project: <em>₹190 Cr</em>. 40% executed by Q3 FY26; balance by <em>Jun-2026</em>. This is the largest single order in Venus's history — from "one of India's leading integrated power plant equipment manufacturers" (Q1 FY26 concall). Power sector is now the biggest domestic growth driver alongside chemicals and oil & gas. [Source: Q1 FY26 Concall; ICICI Direct Rapid Results Q1 FY26]</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- T3 -->
-    <div class="tc" id="tc3">
-      <div class="tc-head" onclick="toggleTc('tc3')">
-        <span class="tc-num">T-3</span>
-        <div style="flex:1;padding:0 8px"><div class="tc-title">Nuclear / Titanium Tubes — Early Mover in a Near-Zero Competition Niche</div></div>
-        <span class="tc-badge bHC">HIGH CONVICTION</span>
-        <span class="chev">▾</span>
-      </div>
-      <div class="tc-body">
-        <div class="tc-desc">India's <strong>SHANTI Bill (Simplified Harmonised Atomic Energy New Technologies & Industries)</strong> is opening nuclear power to private sector participation. Emkay Research (Mar-2026) explicitly named Venus Pipes as a key beneficiary alongside KSB, Kilburn Engineering, and Walchandnagar Industries. Venus has invested in <strong>titanium welded tube manufacturing</strong> — a product manufactured by only a handful of global players. Nuclear and hydrogen applications require titanium or high-grade stainless tubes; Venus is positioning to be the domestic supplier of record.</div>
-        <div class="tc-data">
-          <div class="td-box">
-            <div class="td-lbl">SHANTI Bill Context</div>
-            <div class="td-val">The Simplified Harmonised Atomic Energy New Technologies & Industries Bill allows private sector entry into nuclear power — potentially 20+ new reactors over the next 15 years. Each nuclear reactor requires thousands of metres of high-specification stainless/titanium tubes for heat exchangers, condenser tubes, and process lines. Current supplier: primarily imports and NPCIL-approved vendors. Venus is pursuing NPCIL/DAE approvals. [Source: Emkay Research Mar-2026; Groww News Mar-2026]</div>
-          </div>
-          <div class="td-box">
-            <div class="td-lbl">Titanium — The Moat Product</div>
-            <div class="td-val">Titanium welded tubes: manufactured by very few players globally. High-precision, corrosion-resistant — required in nuclear, chemical, desalination. Venus's manufacturing capability in titanium tubes gives it a <em>first-mover advantage in India</em> as nuclear and hydrogen sectors scale. Not yet meaningful revenue contributor, but qualifies Venus for approvals that take 2–3 years to secure. Start now = revenue in FY28+. [Source: Business Standard Feb-2024; Tube & Pipe India 2024]</div>
-          </div>
-          <div class="td-box">
-            <div class="td-lbl">Hydrogen Sector Convergence</div>
-            <div class="td-val">India's National Green Hydrogen Mission targets 5 MMT of green hydrogen by 2030. Hydrogen applications require stainless (SS 316L/304) and titanium tubes for electrolysers, piping, and storage. Venus is explicitly cited in management commentary as targeting hydrogen sector approvals. Revenue timeline: <em>FY27–FY28</em> as projects begin procurement. Structural, not cyclical. [Source: Q2 FY26 Concall; MNC/L Note Dec-2025]</div>
-          </div>
-          <div class="td-box">
-            <div class="td-lbl">Oil & Gas Approvals in Progress</div>
-            <div class="td-val">ONGC, OIL India, IOCL, and EPC contractors require API-certified stainless tubes. Venus is pursuing these approvals — received a few, more pending. Once an oil & gas EPC approves a vendor, it becomes a preferred supplier for 5–10 years. India's refinery expansion (IOC Panipat, BPCL, RIL) = structural demand. [Source: Monarch Networth Q3 FY26 Note; Q3 FY26 Concall 5-Feb-2026]</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- T4 -->
-    <div class="tc" id="tc4">
-      <div class="tc-head" onclick="toggleTc('tc4')">
-        <span class="tc-num">T-4</span>
-        <div style="flex:1;padding:0 8px"><div class="tc-title">Export Recovery — Europe & Middle East Traction, US Tariff Risk Manageable</div></div>
-        <span class="tc-badge bMC">MEDIUM CONVICTION</span>
-        <span class="chev">▾</span>
-      </div>
-      <div class="tc-body">
-        <div class="tc-desc">Exports were <strong>40% of Q2 FY26 revenue</strong>, partially pulled back to <strong>32% in Q3 FY26</strong> due to US tariff uncertainty, but Europe and Middle East remain strong. Management noted US contributed ~20% of exports in Q2 and guided normalisation to <strong>25–30% of total revenue</strong> in a steadier export mix. The derating of the US share is a short-term friction — the medium-term story is Venus becoming a preferred supplier to European buyers seeking non-China SS pipes at competitive pricing.</div>
-        <div class="tc-data">
-          <div class="td-box">
-            <div class="td-lbl">Export Trajectory</div>
-            <div class="td-val">Q3 FY25: exports were 38.5% of revenue (153% YoY growth — highest ever). Q1 FY26: 37.3% (69% YoY). Q2 FY26: 40% (53% YoY). Q3 FY26: <em>32%</em> — US tariff uncertainty pulling back. Management guiding recovery to <em>25–30% normalised mix</em>. Europe (EU import substitution post-China restrictions) and Middle East are the structural markets. [Source: ICICI Direct Rapid Results; Alpha Spread Q3 FY26 concall]</div>
-          </div>
-          <div class="td-box">
-            <div class="td-lbl">US Tariff Risk Assessment</div>
-            <div class="td-val">US was ~20% of exports in Q2 FY26. If US tariffs continue, management expects to redirect to Europe + Middle East. <em>Mitigant: </em> Gujarat's proximity to Mundra port allows rapid market redirection. Venus's European dealer network (Tube Düsseldorf presence, Maastricht trade shows) provides alternate demand pipeline. Total US exposure: ~5–8% of total revenue — manageable. [Source: Q2 FY26 Concall; Business Standard]</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- T5 -->
-    <div class="tc" id="tc5">
-      <div class="tc-head" onclick="toggleTc('tc5')">
-        <span class="tc-num">T-5</span>
-        <div style="flex:1;padding:0 8px"><div class="tc-title">Management Guidance: 20%+ Revenue Growth FY27 + Margin Expansion to 16–18%</div></div>
-        <span class="tc-badge bMC">MEDIUM CONVICTION</span>
-        <span class="chev">▾</span>
-      </div>
-      <div class="tc-body">
-        <div class="tc-desc">Management guided <strong>at least 20% revenue growth for FY27</strong> (Q3 FY26 concall, Feb-2026), driven by new seamless capacity, fittings ramp-up, and continued domestic demand from power and chemicals sectors. EBITDA margin guidance of <strong>16–18% by FY27</strong> implies ~150–360 bps expansion from current 16.4% as higher-margin products (fittings, titanium, nuclear-grade) contribute more. Monarch Networth maintained BUY with target ₹1,680 post Q3 FY26 results.</div>
-        <div class="tc-data">
-          <div class="td-box">
-            <div class="td-lbl">Q3 FY26 Concall Key Quote</div>
-            <div class="td-val"><span class="q">"We expect revenue growth of at least 20% in FY27, driven by new capacities and continued domestic and export demand. EBITDA margins are expected to rise toward 16–18% by FY27 as new capacity and value-added products ramp up." — Management, Alpha Spread Q3 FY26 summary, Feb-2026</span></div>
-          </div>
-          <div class="td-box">
-            <div class="td-lbl">Analyst Coverage</div>
-            <div class="td-val">Monarch Networth: <em>BUY, target ₹1,680</em> (post Q3 FY26). Valuation: 25x Sep-2027E EPS. Cut FY26/FY27 earnings by 4%/3% for higher depreciation and slower welded segment — still maintain BUY. ICICI Securities: site visit scheduled 9-Apr-2026 (Dhaneti plant). Yahoo Finance: analyst avg target ₹1,825, current ₹1,015. [Source: Monarch Networth Note Feb-2026; Screener.in Apr-2026]</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- T6 -->
-    <div class="tc" id="tc6">
-      <div class="tc-head" onclick="toggleTc('tc6')">
-        <span class="tc-num">T-6</span>
-        <div style="flex:1;padding:0 8px"><div class="tc-title">Valuation Reset — 32% Off Peak, FY27 Earnings Growth Can Re-rate</div></div>
-        <span class="tc-badge bOP">OPTIONALITY</span>
-        <span class="chev">▾</span>
-      </div>
-      <div class="tc-body">
-        <div class="tc-desc">The stock has corrected <strong>32% from its 52W high of ₹1,660</strong> to ₹1,132 (current). The correction is justified — margin compression, higher depreciation from capex, and US tariff uncertainty. However, at <strong>PE 23.4x on a 20%+ growth business with multiple capacity triggers</strong>, the downside appears limited. The correction has moved Venus from "expensive growth story" to "reasonable entry in a quality small-cap compounder".</div>
-        <div class="tc-data">
-          <div class="td-box">
-            <div class="td-lbl">What Drove the De-Rating</div>
-            <div class="td-val"><strong>Changed:</strong> EBITDA margin compressed from ~20% (FY24) to 16.4% as capex depreciation kicked in. US export uncertainty. Higher interest cost on ₹175 Cr capex borrowing.<br><br><strong>Unchanged:</strong> Order book growing (₹350 Cr → ₹470 Cr). Revenue 28% YoY. Management guidance intact. All new capacities commissioning on schedule. Nuclear/titanium optionality building.</div>
-          </div>
-          <div class="td-box">
-            <div class="td-lbl">ICICI Securities Site Visit — 9-Apr-2026</div>
-            <div class="td-val">ICICI Securities has a revised analyst/investor meeting scheduled at Dhaneti plant on <em>9 April 2026</em> (BSE Regulation 30 filing, 8-Apr-2026). Site visits by institutional brokers typically precede initiations or rating upgrades. This is a near-term catalyst that could bring fresh institutional coverage and re-rating. [Source: Screener.in BSE filing 8-Apr-2026]</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
+<div class="sec">Bear / Base / Bull Scenarios</div>
+<div class="sg">
+<div class="sbear"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#DC2626;margin-bottom:5px;">Bear</div><div style="font-size:26px;font-weight:800;font-family:'Courier New',monospace;color:#DC2626;">&#8377;1,100</div><div style="font-size:12px;font-weight:700;color:#DC2626;">-37% downside</div><div style="font-size:12px;margin-top:5px;color:#64748B;">Order book delays, promoter dilution, IWAI budget cuts. PE compresses to 40x.</div></div>
+<div class="sbase"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#D97706;margin-bottom:5px;">Base</div><div style="font-size:26px;font-weight:800;font-family:'Courier New',monospace;color:#D97706;">&#8377;2,200</div><div style="font-size:12px;font-weight:700;color:#D97706;">+26% upside</div><div style="font-size:12px;margin-top:5px;color:#64748B;">FY27 revenue &#8377;350 Cr, PAT &#8377;120 Cr. Tonnage tax boosts net margin. PE 55x.</div></div>
+<div class="sbull"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#16A34A;margin-bottom:5px;">Bull</div><div style="font-size:26px;font-weight:800;font-family:'Courier New',monospace;color:#16A34A;">&#8377;2,800</div><div style="font-size:12px;font-weight:700;color:#16A34A;">+61% upside</div><div style="font-size:12px;margin-top:5px;color:#64748B;">&#8377;500 Cr revenue by FY28 on full shipbuilding ramp. PAT &#8377;175 Cr. PE 65x.</div></div>
 </div>
-
-<!-- ═══════ PANEL 3: PRICED IN & RISKS ═══════ -->
-<div id="p-priced" class="panel">
-
-  <div class="sec-lbl">What Is Already Priced In</div>
-  <div class="priced-block">
-    <div class="priced-lbl">Market Already Knows</div>
-    <div class="priced-item"><span class="p-dot"></span><span>Revenue growth of 25–28% YoY — well-tracked, consistent for 3 years. At 23x PE, basic topline growth is already embedded.</span></div>
-    <div class="priced-item"><span class="p-dot"></span><span>Seamless pipe expansion story — commissioning of 1,800 MTPA has been communicated since early FY26 and is largely priced in by sell-side analysts.</span></div>
-    <div class="priced-item"><span class="p-dot"></span><span>Power sector demand — general infrastructure capex tailwind is a known theme, not Venus-specific.</span></div>
-    <div class="priced-item"><span class="p-dot"></span><span>Export growth — FY25 exported at 38% of revenue. The market is aware Venus is an exporter with European and Middle East traction.</span></div>
-  </div>
-
-  <div class="sec-lbl mt">What Is NOT Priced In (The Alpha)</div>
-  <div class="priced-block" style="background:rgba(0,201,122,.05);border-color:rgba(0,201,122,.2)">
-    <div class="priced-lbl" style="color:var(--green)">Underappreciated Growth Levers</div>
-    <div class="priced-item"><span class="p-dot" style="background:var(--green)"></span><span><strong>Nuclear / SHANTI Bill beneficiary status</strong> — Emkay named Venus as a direct beneficiary in Mar-2026. The market has not re-rated Venus on this basis. If titanium/nuclear tube approvals come through, this is a structural re-rating catalyst that could compress the peer discount.</span></div>
-    <div class="priced-item"><span class="p-dot" style="background:var(--green)"></span><span><strong>Fittings as a margin expansion lever</strong> — Street models assume flat 16% EBITDA margins. If fittings ramp to even ₹50–80 Cr revenue at 22%+ margins, blended EBITDA jumps to 17–18%. This is a FY27 catalyst, not yet in consensus.</span></div>
-    <div class="priced-item"><span class="p-dot" style="background:var(--green)"></span><span><strong>ICICI Securities institutional site visit (9-Apr-2026)</strong> — fresh institutional coverage from a large broker can be a near-term re-rating event for a ₹2,345 Cr small-cap.</span></div>
-    <div class="priced-item"><span class="p-dot" style="background:var(--green)"></span><span><strong>Hydrogen sector pipeline approvals</strong> — India's Green Hydrogen Mission 5 MMT by 2030 means large procurement of SS/Ti tubes begins FY27–FY28. Venus is pursuing approvals now. This is 2–3 year optionality not in any current model.</span></div>
-  </div>
-
-  <div class="sec-lbl mt">Key Risks to Thesis</div>
-  <div class="risk-block">
-    <div class="risk-lbl">Risk Register</div>
-    <div class="risk-item"><span class="risk-dot"></span><span><strong>Margin Compression Continues</strong> — EBITDA margin has trended down from ~20% (FY24) to 16.4% (Q3 FY26) driven by higher depreciation from capex and rising employee + operating costs. If fittings ramp is slower than expected, margins may stay at 15–16%, compressing PAT growth below revenue growth.</span></div>
-    <div class="risk-item"><span class="risk-dot"></span><span><strong>US Tariff Escalation</strong> — US contributed ~20% of exports in Q2 FY26. A sustained 25%+ tariff on Indian SS pipes would require demand redirection. While management says Europe/Middle East can absorb, execution risk is real in a short timeframe.</span></div>
-    <div class="risk-item"><span class="risk-dot"></span><span><strong>Raw Material Volatility</strong> — Stainless steel is primarily nickel + chromium. Nickel is globally volatile (LME driven). While Venus hedges RM costs, a sustained RM price spike compresses margins. Company runs cost-plus model for domestic contracts but not all export orders.</span></div>
-    <div class="risk-item"><span class="risk-dot"></span><span><strong>Approval Delays for New Sectors</strong> — Nuclear, oil & gas, hydrogen, and railway approvals take 2–3 years. Any delay in receiving vendor approvals from NPCIL, ONGC, or hydrogen EPC players pushes the high-value pipeline further out. Revenue visibility from these sectors remains limited.</span></div>
-    <div class="risk-item"><span class="risk-dot"></span><span><strong>Debt Elevation</strong> — Borrowings have risen to fund ₹175 Cr capex. Management guided debt to peak in FY27 before normalising. Interest cost is rising (₹34 Cr in 9M FY26 vs ₹22 Cr in 9M FY25) — suppressing PAT growth relative to EBITDA growth. Debt-to-equity is manageable but not debt-free like peers Ratnamani or APL Apollo.</span></div>
-    <div class="risk-item"><span class="risk-dot"></span><span><strong>Fittings Ramp Risk</strong> — MD explicitly called it "a new business for us" with a gradual ramp. Fittings require customer approvals, product qualification, and inventory build. Contribution in FY26 is minimal; meaningful only from FY27 Q2+. Any further delay pushes the margin expansion story to FY28.</span></div>
-    <div class="risk-item"><span class="risk-dot"></span><span><strong>Small-Cap Liquidity Risk</strong> — MCap ₹2,345 Cr with daily volumes that can be thin. Institutional exits can cause sharp drawdowns (as seen with -32% from 52W high). Not suitable for large position sizing without liquidity awareness.</span></div>
-  </div>
-
+<div class="g2" style="margin-top:16px;">
+<div class="card"><div class="sec">Top Catalysts</div>
+<div class="ir" style="background:#F0FDF4;"><span style="color:#16A34A;font-size:16px;flex-shrink:0;">&#9650;</span><div><div style="font-weight:700;font-size:13px;">Tonnage Tax — Near-Zero Effective Tax Rate</div><div style="font-size:12px;color:#64748B;">New tonnage tax scheme election means effective tax rate below 1%. Every rupee of EBITDA flows almost entirely to PAT — transformational margin improvement.</div></div></div>
+<div class="ir" style="background:#F0FDF4;"><span style="color:#16A34A;font-size:16px;flex-shrink:0;">&#9650;</span><div><div style="font-weight:700;font-size:13px;">&#8377;700 Cr Green Tug Contract (15-Year)</div><div style="font-size:12px;color:#64748B;">Landmark 15-year green tug contract provides long-duration revenue certainty. Game-changer for earnings visibility. First contract of this type for KMEW.</div></div></div>
+<div class="ir" style="background:#F0FDF4;"><span style="color:#16A34A;font-size:16px;flex-shrink:0;">&#9650;</span><div><div style="font-weight:700;font-size:13px;">Shipbuilding Entry — IWAI &#8377;230 Cr Orders</div><div style="font-size:12px;color:#64748B;">KMEW entered commercial shipbuilding, securing &#8377;230 Cr IWAI orders. &#8377;100 Cr shipyard investment targets &#8377;500-700 Cr revenue from this vertical alone.</div></div></div>
 </div>
-
-<!-- ═══════ PANEL 4: SCORECARD ═══════ -->
-<div id="p-scorecard" class="panel">
-
-  <div class="sec-lbl">Trigger Scorecard</div>
-  <table class="score-table">
-    <thead>
-      <tr>
-        <th>Trigger</th><th>Conviction</th><th>Horizon</th><th>Revenue / Margin Impact</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td>T-1: Fittings plant live (PFF bundle)</td><td><span class="conf-dot cd-h"></span> HIGH</td><td>FY27 Q2+</td><td>+150–360 bps EBITDA margin</td></tr>
-      <tr><td>T-2: Seamless capacity + ₹190 Cr power order</td><td><span class="conf-dot cd-h"></span> HIGH</td><td>Jun-2026</td><td>₹190 Cr order completion</td></tr>
-      <tr><td>T-3: Nuclear / Titanium (SHANTI Bill)</td><td><span class="conf-dot cd-h"></span> HIGH</td><td>FY27–FY28</td><td>Long-term structural; approval-gated</td></tr>
-      <tr><td>T-4: Export recovery (Europe/ME)</td><td><span class="conf-dot cd-m"></span> MEDIUM</td><td>FY27 Q1</td><td>Return to 35%+ export mix</td></tr>
-      <tr><td>T-5: Mgmt guidance 20%+ revenue FY27</td><td><span class="conf-dot cd-m"></span> MEDIUM</td><td>FY27</td><td>Revenue ₹1,100+ Cr if delivered</td></tr>
-      <tr><td>T-6: Valuation reset (32% off peak)</td><td><span class="conf-dot" style="background:var(--purple)"></span> OPTION</td><td>12–18 months</td><td>Re-rate to 28–32x on earnings growth</td></tr>
-    </tbody>
-  </table>
-
-  <div class="sec-lbl mt">Financial Metrics Summary</div>
-  <div class="fin-row">
-    <div class="fin-box"><div class="fin-lbl">Revenue CAGR 3yr</div><div class="fin-val">~26%</div><div class="fin-sub">FY22–FY25</div></div>
-    <div class="fin-box"><div class="fin-lbl">PAT CAGR 3yr</div><div class="fin-val">~24%</div><div class="fin-sub">FY22–FY25</div></div>
-    <div class="fin-box"><div class="fin-lbl">EBITDA Margin</div><div class="fin-val">16.4%</div><div class="fin-sub">Q3 FY26 · Target 18%</div></div>
-    <div class="fin-box"><div class="fin-lbl">Order Book</div><div class="fin-val">₹470 Cr</div><div class="fin-sub">+34% YoY · ~0.5x TTM rev</div></div>
-  </div>
-
-  <div class="sec-lbl">Analyst Consensus (Apr-2026)</div>
-  <div class="snapshot">
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--b1)">
-        <span style="font-size:12px">Monarch Networth Capital</span>
-        <span style="font-family:var(--mono);font-size:11px;color:var(--green)">BUY · Target ₹1,680</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--b1)">
-        <span style="font-size:12px">Yahoo Finance Analyst Avg</span>
-        <span style="font-family:var(--mono);font-size:11px;color:var(--green)">Strong Buy avg · Target ₹1,825</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--b1)">
-        <span style="font-size:12px">MarketsMojo Rating</span>
-        <span style="font-family:var(--mono);font-size:11px;color:var(--amber)">HOLD (upgraded from Sell 20-Feb-26)</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0">
-        <span style="font-size:12px">ICICI Securities</span>
-        <span style="font-family:var(--mono);font-size:11px;color:var(--blue)">Site visit 9-Apr-2026 (coverage pending)</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="sec-lbl mt">Report Metadata</div>
-  <div class="snapshot">
-    <div class="snap-grid">
-      <div class="snap-item"><div class="sl">Report Date</div><div class="sv">08-Apr-2026</div></div>
-      <div class="snap-item"><div class="sl">Data Sources</div><div class="sv" style="font-size:10px">Q3 FY26 Concall 5-Feb-2026 · BSE Filings · Screener.in · Monarch Networth · ICICI Direct · Alpha Spread · MarketsMojo · Groww</div></div>
-      <div class="snap-item"><div class="sl">CMP at report</div><div class="sv">₹1,132 (8-Apr-2026)</div></div>
-      <div class="snap-item"><div class="sl">Ticker</div><div class="sv">NSE: VENUSPIPES</div></div>
-    </div>
-  </div>
-
+<div class="card"><div class="sec">Top Risks</div>
+<div class="ir" style="background:#FEF2F2;"><span style="color:#DC2626;font-size:16px;flex-shrink:0;">&#9660;</span><div><div style="font-weight:700;font-size:13px;">Promoter Dilution (-13.5% in 3 Years)</div><div style="font-size:12px;color:#64748B;">Promoter stake fell from 67% to 53.6%. Continuous dilution via preferential allotments. If it crosses below 50%, significant governance concern.</div></div></div>
+<div class="ir" style="background:#FEF2F2;"><span style="color:#DC2626;font-size:16px;flex-shrink:0;">&#9660;</span><div><div style="font-weight:700;font-size:13px;">Order Book Concentration Risk</div><div style="font-size:12px;color:#64748B;">Top 5 orders = 74% of order book value. IWAI-dependent revenue. Government budget cuts or delays would severely impact execution timeline.</div></div></div>
+<div class="ir" style="background:#FEF2F2;"><span style="color:#DC2626;font-size:16px;flex-shrink:0;">&#9660;</span><div><div style="font-weight:700;font-size:13px;">Debtor Days Rising (106 &#8594; 131)</div><div style="font-size:12px;color:#64748B;">Receivables building as government client collections slow. If debtor days cross 180, working capital strain could limit growth.</div></div></div>
 </div>
-
-<!-- ═══════ PANEL 5: VALUATION ═══════ -->
-<div id="p-valuation" class="panel">
-
-  <!-- Sector Premium Framework -->
-  <div class="sec-lbl">Industry Premium Framework — Why SS Pipe Manufacturers Trade at a Premium</div>
-  <div class="sector-box">
-    <div class="sector-title">Stainless Steel Speciality Pipe Manufacturers: The Valuation Argument</div>
-    <div class="sector-row"><span class="sector-icon">⬡</span><span><strong>Not a commodity steel play.</strong> Venus makes stainless steel (SS 304/316/316L) and titanium pipes — not carbon steel. Stainless commands 5–10x the realisation of carbon steel, has higher barriers (quality approvals, import alternatives), and serves speciality industries (pharma, nuclear, oil & gas). Peers like Ratnamani Metals trade at 28–30x PE precisely because of this premium positioning.</span></div>
-    <div class="sector-row"><span class="sector-icon">⬡</span><span><strong>Approval moat = recurring revenue.</strong> Once an end-user (ONGC, NTPC, pharma EPC) approves a vendor, switching cost is very high. Approval takes 2–3 years; losing it takes one quality failure. This creates annuity-like revenue that justifies a higher-than-sector multiple.</span></div>
-    <div class="sector-row"><span class="sector-icon">⬡</span><span><strong>Import substitution tailwind.</strong> India imported ~₹4,000–5,000 Cr of stainless pipes annually before domestic capacity built up. Government's push for domestically manufactured critical infrastructure components (nuclear, defence, hydrogen) creates a structural policy tailwind for domestic SS pipe makers.</span></div>
-    <div class="sector-row"><span class="sector-icon">⬡</span><span><strong>Operating leverage.</strong> Venus invested ₹175 Cr in capex over FY24–FY26. Depreciation drag is peaking now. As utilisation rises, incremental revenue flows straight to the bottom line with near-zero incremental capex needed — classic operating leverage story valued at higher multiples.</span></div>
-    <div class="sector-row"><span class="sector-icon">⬡</span><span><strong>Small-cap growth premium.</strong> At MCap ₹2,345 Cr, Venus is a small-cap with a revenue of ₹1,123 Cr — sub 2x Price/Sales. Small caps with 20%+ revenue growth in capex-intensive sectors historically re-rate as they approach mid-cap. Historical re-rating from small to mid-cap can add 30–50% in multiple alone.</span></div>
-  </div>
-
-  <!-- Historical PE Band -->
-  <div class="sec-lbl">Historical PE Band — FY23 to Apr-2026</div>
-  <div class="pe-band-wrap">
-    <div class="pe-band-title">Trailing PE Range Since Listing (May 2022)</div>
-    <div class="pe-band-sub">Min ~14x (post-listing correction, FY23) · Max ~48x (FY24 peak) · 2yr avg ~32x · Current 23.4x</div>
-    <!-- Range: 14x to 48x = 34 span -->
-    <!-- avg 32x = (32-14)/34 = 52.9% -->
-    <!-- current 23.4x = (23.4-14)/34 = 27.6% -->
-    <div class="pe-track">
-      <div class="pe-range" style="left:0;right:0"></div>
-      <div style="position:absolute;top:0;left:26%;width:30%;height:100%;background:rgba(0,201,122,.1);border-radius:3px"></div>
-      <div class="pe-marker pe-m-avg" style="left:calc(52.9% - 1.5px)" title="2yr avg ~32x"></div>
-      <div class="pe-marker pe-m-cur" style="left:calc(27.6% - 1.5px)" title="Current 23.4x"></div>
-    </div>
-    <div class="pe-labels">
-      <span>14x (low)</span>
-      <span style="color:var(--green)">← fair zone 22–35x →</span>
-      <span>48x (peak)</span>
-    </div>
-    <div class="pe-legend">
-      <span class="pe-leg"><span class="pe-leg-dot" style="background:var(--amber)"></span>2yr avg PE: ~32x</span>
-      <span class="pe-leg"><span class="pe-leg-dot" style="background:var(--blue)"></span>Current PE: 23.4x (8-Apr-2026)</span>
-      <span class="pe-leg"><span class="pe-leg-dot" style="background:rgba(0,201,122,.4)"></span>Historical fair zone: 22–35x</span>
-    </div>
-    <div style="margin-top:12px;font-size:11px;color:var(--t2);line-height:1.6">
-      Current PE of <strong style="color:var(--blue)">23.4x</strong> is materially below the 2yr historical average of <strong style="color:var(--amber)">~32x</strong>. The stock is trading at a <strong>~27% discount to its own average multiple</strong>. This is the core valuation argument: not cheap in absolute terms, but cheap relative to history and to peers. The discount reflects margin compression concerns — which will resolve as fittings and nuclear/titanium approvals materialise.
-    </div>
-  </div>
-
-  <!-- PEG & Quality Ratios -->
-  <div class="sec-lbl">Key Valuation & Quality Ratios</div>
-  <div class="peg-row">
-    <div class="peg-box">
-      <div class="peg-lbl">PE (TTM)</div>
-      <div class="peg-val" style="color:var(--green)">23.4x</div>
-      <div class="peg-sub">Vs 2yr avg ~32x. At 27% discount to own history. Near the low end of its historical range.</div>
-    </div>
-    <div class="peg-box">
-      <div class="peg-lbl">EV / EBITDA</div>
-      <div class="peg-val" style="color:var(--amber)">13.4x</div>
-      <div class="peg-sub">Vs Ratnamani 18.2x, Welspun 10x. Fair for a growth SS pipe maker with capex in deployment.</div>
-    </div>
-    <div class="peg-box">
-      <div class="peg-lbl">Price / Book</div>
-      <div class="peg-val" style="color:var(--amber)">3.7x</div>
-      <div class="peg-sub">26% premium to broad peer median of ~1.3x (Value Research, Jan-2026). Justified by higher growth and margin profile.</div>
-    </div>
-    <div class="peg-box">
-      <div class="peg-lbl">EV / Sales</div>
-      <div class="peg-val" style="color:var(--green)">2.1x</div>
-      <div class="peg-sub">Low EV/Sales for a speciality manufacturer with 16–18% EBITDA margin. Ratnamani is at ~3x. Venus re-rating opportunity visible here.</div>
-    </div>
-  </div>
-
-  <!-- Peer Comparison -->
-  <div class="sec-lbl">Peer Comparison — SS & Speciality Pipe Manufacturers</div>
-  <div class="peer-wrap">
-    <table class="peer-table">
-      <thead>
-        <tr>
-          <th style="text-align:left">Company</th>
-          <th>MCap (₹Cr)</th>
-          <th>PE (TTM)</th>
-          <th>EV/EBITDA</th>
-          <th>Rev CAGR</th>
-          <th>EBITDA%</th>
-          <th>PB</th>
-          <th>Debt</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="vp-row">
-          <td>Venus Pipes & Tubes</td>
-          <td>2,345</td>
-          <td class="val-hi">23.4x</td>
-          <td class="val-hi">13.4x</td>
-          <td class="val-hi">~26%</td>
-          <td class="val-mid">16.4%</td>
-          <td class="val-mid">3.7x</td>
-          <td class="val-mid">Moderate</td>
-        </tr>
-        <tr>
-          <td>Ratnamani Metals & Tubes</td>
-          <td>~14,000</td>
-          <td class="val-lo">29.3x</td>
-          <td class="val-lo">18.2x</td>
-          <td class="val-mid">~18%</td>
-          <td class="val-hi">18–20%</td>
-          <td class="val-lo">5.2x</td>
-          <td class="val-hi">Low</td>
-        </tr>
-        <tr>
-          <td>APL Apollo Tubes</td>
-          <td>~35,000</td>
-          <td class="val-mid">~45x</td>
-          <td class="val-mid">~22x</td>
-          <td class="val-hi">~28%</td>
-          <td class="val-mid">~12%</td>
-          <td class="val-lo">~9x</td>
-          <td class="val-hi">Zero</td>
-        </tr>
-        <tr>
-          <td>Welspun Corp</td>
-          <td>~18,000</td>
-          <td class="val-hi">13.4x</td>
-          <td class="val-hi">10.0x</td>
-          <td class="val-lo">~8%</td>
-          <td class="val-mid">~14%</td>
-          <td class="val-mid">2.2x</td>
-          <td class="val-mid">Moderate</td>
-        </tr>
-        <tr>
-          <td>JTL Industries</td>
-          <td>~2,800</td>
-          <td class="val-mid">~20x</td>
-          <td class="val-hi">~12x</td>
-          <td class="val-mid">~20%</td>
-          <td class="val-mid">~12%</td>
-          <td class="val-mid">2.5x</td>
-          <td class="val-mid">Moderate</td>
-        </tr>
-        <tr style="background:var(--s2)">
-          <td style="color:var(--t2);font-style:italic">Peer Median (SS peers)</td>
-          <td style="color:var(--t2)">—</td>
-          <td style="color:var(--t2)">~24x</td>
-          <td style="color:var(--t2)">~15x</td>
-          <td style="color:var(--t2)">~18%</td>
-          <td style="color:var(--t2)">~14%</td>
-          <td style="color:var(--t2)">~3.5x</td>
-          <td style="color:var(--t2)">—</td>
-        </tr>
-        <tr style="background:rgba(240,165,0,.03)">
-          <td style="color:var(--amber);font-family:var(--mono);font-size:10px">Venus vs SS Median</td>
-          <td style="color:var(--t2)">—</td>
-          <td class="val-hi">At median</td>
-          <td class="val-hi">-11% disc</td>
-          <td class="val-hi">+44% higher</td>
-          <td class="val-mid">+17% higher</td>
-          <td class="val-mid">At median</td>
-          <td class="val-mid">—</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-bottom:18px;line-height:1.7">
-    Sources: 5paisa (8-Apr-2026) · MarketsMojo (Feb-Mar 2026) · Value Research Online (Jan-2026) · MarketsMojo Peer Page · Screener.in<br>
-    APL Apollo, Welspun, JTL figures are estimates based on latest available data. Ratnamani PE per MarketsMojo Feb-2026.
-  </div>
-
-  <!-- Valuation Insight -->
-  <div class="sec-lbl">Valuation Insight</div>
-  <div class="val-intro">
-    Venus trades at <strong>23.4x PE — essentially at the sector median</strong> of ~24x for SS/speciality pipe peers, despite having the <strong>highest revenue CAGR in the peer group (~26% vs median 18%)</strong>. On EV/EBITDA at 13.4x, Venus is cheaper than Ratnamani (18.2x) — a better-established peer — despite having the same growth trajectory.
-    <br><br>
-    The bear case is margin concern: Venus's EBITDA margin at 16.4% is structurally lower than Ratnamani (18–20%). This is the reason it doesn't command Ratnamani's multiple. The bull case: fittings + titanium ramp → margin expansion to 17–19% → Venus re-rates toward Ratnamani's multiple. A move from 23x to 28x alone, on flat earnings, implies 22% upside.
-    <br><br>
-    <strong>Most important valuation signal: Venus is trading at a ~27% discount to its own 2yr average PE of ~32x.</strong> This is historically a good entry zone for quality small-cap compounders with identifiable near-term catalysts.
-  </div>
-
-  <!-- Scenarios -->
-  <div class="sec-lbl">Fair Value Scenarios — FY27E EPS Based</div>
-  <div style="font-size:11px;color:var(--t2);margin-bottom:12px;line-height:1.6">FY27E PAT assumed ₹115–135 Cr (base: 20–25% growth on FY25 ₹92 Cr + margin expansion). EPS FY27E ~₹55–65 on ~2.07 Cr shares outstanding.</div>
-  <div class="scenarios">
-    <div class="sc-box sc-bear">
-      <div class="sc-lbl">Bear</div>
-      <div class="sc-price">₹880–970</div>
-      <div class="sc-detail">PE 16–18x on FY27E EPS ₹55. Assumes: fittings delayed to FY28, US tariffs sustained, margins flat at 15–16%, export share stays at 30%. Downside from current ₹1,132 is ~14–22%.</div>
-    </div>
-    <div class="sc-box sc-base">
-      <div class="sc-lbl">Base</div>
-      <div class="sc-price">₹1,430–1,625</div>
-      <div class="sc-detail">PE 22–25x on FY27E EPS ₹65. Assumes: fittings contribute ₹60–80 Cr at 20%+ margin, seamless capacity utilised 70%+, exports recover to 35%+, margins reach 17–17.5%. Upside ~26–43%.</div>
-    </div>
-    <div class="sc-box sc-bull">
-      <div class="sc-lbl">Bull</div>
-      <div class="sc-price">₹1,750–2,000</div>
-      <div class="sc-detail">PE 28–32x on FY27E EPS ₹62. Assumes: nuclear/SHANTI approval, oil & gas approvals materialise, fittings ramp exceeds expectations, margins breach 18%, analyst coverage initiations (ICICI). Full re-rating to historical avg multiple. Upside ~55–77%.</div>
-    </div>
-  </div>
-
-  <div style="font-family:var(--mono);font-size:9px;color:var(--t3);line-height:1.8;padding:10px 12px;background:var(--s2);border-radius:6px;border:1px solid var(--b1)">
-    ⚠ Scenarios for illustrative research purposes only. Not a buy/sell recommendation. EPS estimates are independent research estimates; Venus Pipes does not provide EPS guidance. Actual results may differ materially. Past performance is not a guide to future returns.
-  </div>
-
 </div>
+</div><div class="db">&#9888; Data sourced from public sources. Not SEBI-registered investment advice.</div></div>
 
-<!-- BOTTOM NAV -->
-<nav class="bnav">
-  <button class="ntab on" id="n-snapshot" onclick="sw('snapshot',this)">
-    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-    Snapshot
-  </button>
-  <button class="ntab" id="n-triggers" onclick="sw('triggers',this)">
-    <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-    Triggers
-  </button>
-  <button class="ntab" id="n-priced" onclick="sw('priced',this)">
-    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-    Risks
-  </button>
-  <button class="ntab" id="n-scorecard" onclick="sw('scorecard',this)">
-    <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-    Scorecard
-  </button>
-  <button class="ntab" id="n-valuation" onclick="sw('valuation',this)">
-    <svg viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
-    Valuation
-  </button>
-</nav>
+<!-- TAB 1: OVERVIEW -->
+<div id="tab-1" class="tp"><div class="c">
+<div class="sec">Company at a Glance</div>
+<div class="g2">
+<div class="card">
+<p style="font-size:14px;margin-bottom:10px;">Knowledge Marine &amp; Engineering Works Ltd (KMEW), incorporated in 2015, is India's fastest-growing marine infrastructure services company. Based in Mumbai, KMEW specialises in dredging operations, owning and chartering marine crafts, repair and maintenance of vessels, and &mdash; since Q3 FY26 &mdash; commercial shipbuilding. The company serves government clients (IWAI, Deendayal Port) and private port operators.</p>
+<p style="font-size:14px;margin-bottom:10px;">KMEW's fleet includes pilot boats, speed patrol boats, survey boats, grab dredgers, trailing suction hopper dredgers (TSHDs), mooring launches, and service boats. Its operational marine assets include River Pearl 1 through River Pearl 12 and growing. The company operates in India and Myanmar.</p>
+<p style="font-size:14px;">In Q3 FY26, KMEW elected the tonnage tax scheme — a transformational financial decision that reduces effective tax rate to below 1%, dramatically improving net profitability even without revenue growth. Combined with the entry into commercial shipbuilding and a &#8377;1,500 Cr order book, the growth outlook is compelling.</p>
+</div>
+<div class="card">
+<div style="font-size:11px;color:var(--muted);margin-bottom:10px;text-transform:uppercase;font-weight:600;">Key Facts</div>
+<table><tr><td style="color:var(--muted);font-size:12px;">BSE / NSE</td><td class="mono">543273 / KMEW</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">Incorporated</td><td>2015</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">HQ</td><td>Mumbai, Maharashtra</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">Promoters</td><td>Syed Fazle Nabi &amp; family (53.63%)</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">Operations</td><td>India + Myanmar</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">Fleet</td><td>40+ marine assets; 26 dredging units</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">Key Clients</td><td>IWAI, Deendayal Port, Bahrain (sand mining)</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">Segments</td><td>Dredging, Ship Chartering, Shipbuilding, Marine Infrastructure</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">Tax Regime</td><td style="color:var(--green);">Tonnage Tax (effective rate &lt;1%)</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">Order Book (Q3 FY26)</td><td class="mono" style="color:var(--green);">&#8377;1,500 Cr</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">Bid Pipeline</td><td class="mono" style="color:var(--green);">&gt;&#8377;3,000 Cr</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">CRISIL Rating</td><td>A-/Stable (Aug 2025)</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">CARE Rating</td><td>A-/Stable (Jul 2025)</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">Face Value</td><td class="mono">&#8377;5</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">Shares Outstanding</td><td class="mono">~2.37 Cr</td></tr></table>
+</div></div>
+<div class="sec">Recent Milestones (18 Months)</div>
+<div class="tl">
+<div class="ti"><div class="td2"></div><div class="tdate">Q3 FY26 (Dec 2025)</div><div class="ttl">Revenue &#8377;90 Cr (+56% YoY) &mdash; breakthrough quarter; OPM 43%; PAT &#8377;33 Cr</div><div class="tbody">Driven by shipbuilding contribution and operational leverage. Tax near-zero from tonnage scheme.</div></div>
+<div class="ti"><div class="td2"></div><div class="tdate">Q3 FY26</div><div class="ttl">Tonnage Tax Scheme Elected &mdash; Effective Tax Rate Below 1%</div><div class="tbody">Transformational. All future profits now taxed at minimal rate under shipping tax regime. No previous announcements had this magnitude of financial impact.</div></div>
+<div class="ti"><div class="td2"></div><div class="tdate">Q3 FY26</div><div class="ttl">&#8377;700 Cr+ Green Tug Contract (15-Year) Secured</div><div class="tbody">15-year guaranteed revenue stream from green tug operations. KMEW's largest and longest-duration contract. Changes long-term earnings visibility dramatically.</div></div>
+<div class="ti"><div class="td2"></div><div class="tdate">Q3 FY26</div><div class="ttl">Commercial Shipbuilding Entry — &#8377;230 Cr IWAI Orders</div><div class="tbody">New revenue vertical. IWAI (Inland Waterways Authority of India) orders for vessel construction. &#8377;100 Cr shipyard investment planned.</div></div>
+<div class="ti"><div class="td2"></div><div class="tdate">Sep 2025</div><div class="ttl">&#8377;284.81 Cr raised via preferential share issue</div><div class="tbody">Capital raise to fund fleet expansion and shipyard. Promoter stake diluted as result.</div></div>
+<div class="ti"><div class="td2"></div><div class="tdate">H1 FY26</div><div class="ttl">7 major order wins aggregating &#8377;968.69 Cr — IWAI, Deendayal Port, Bahrain</div><div class="tbody">Strong win-rate of 50%+ across bids. Diversified across dredging, chartering, and shipbuilding.</div></div>
+<div class="ti"><div class="td2"></div><div class="tdate">Mar 2026</div><div class="ttl">Shareholders approve borrowing limit increase to &#8377;1,200 Cr</div><div class="tbody">Enables fleet expansion and shipyard development. Signals board confidence in revenue pipeline.</div></div>
+</div>
+</div><div class="db">&#9888; Data sourced from public sources. Not SEBI-registered investment advice.</div></div>
+
+<!-- TAB 2: BUSINESS -->
+<div id="tab-2" class="tp"><div class="c">
+<div class="g2">
+<div class="card"><div class="sec">Revenue Mix by Segment (FY26 Est.)</div><div class="cw" style="height:240px;"><canvas id="kmPieChart"></canvas></div></div>
+<div class="card"><div class="sec">Fleet &amp; Capacity</div>
+<div class="tw"><table>
+<thead><tr><th>Asset Type</th><th>Count</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td>Trailing Suction Hopper Dredgers (TSHD)</td><td class="mono">6+</td><td>Capital &amp; maintenance dredging</td></tr>
+<tr><td>Grab Dredgers</td><td class="mono">8+</td><td>Port maintenance, inland waterways</td></tr>
+<tr><td>Pilot / Survey / Patrol Boats</td><td class="mono">12+</td><td>Port operations, govt contracts</td></tr>
+<tr><td>Mooring Launches / Service Boats</td><td class="mono">8+</td><td>Port ancillary services</td></tr>
+<tr><td>River Pearl Series (1&#8211;12)</td><td class="mono">12</td><td>River dredging (IWAI contracts)</td></tr>
+<tr><td><strong>Total Fleet</strong></td><td class="mono"><strong>40+</strong></td><td>Diversified marine operations</td></tr>
+</tbody></table></div>
+<div style="margin-top:10px;padding:9px;border-radius:6px;background:var(--alt);font-size:12px;">&#8377;183 Cr capex planned over 3 years for fleet expansion. &#8377;100 Cr for shipyard facilities. Targeting &#8377;500-700 Cr revenue from shipbuilding within 3 years.</div>
+</div></div>
+<div class="sec">Competitive Moat Analysis</div>
+<div class="g2">
+<div class="card">
+<div style="display:flex;flex-direction:column;gap:12px;">
+<div style="border-left:3px solid var(--green);padding-left:11px;"><div style="font-weight:700;font-size:13px;">Operational Excellence vs DCI (State-Owned Competitor)</div><div style="font-size:12px;color:var(--sec);">DCI (Dredging Corporation of India) is India's largest dredger but KMEW consistently outperforms it on margins (40%+ vs DCI's ~20%) and growth. KMEW's agility and project discipline are its core competitive advantages.</div></div>
+<div style="border-left:3px solid var(--green);padding-left:11px;"><div style="font-weight:700;font-size:13px;">Younger Fleet = Lower Maintenance, Better Bids</div><div style="font-size:12px;color:var(--sec);">Modern, well-maintained fleet enables KMEW to bid competitively on quality-sensitive government contracts where older vessels don't qualify. Younger fleet also reduces downtime and operating cost.</div></div>
+<div style="border-left:3px solid var(--green);padding-left:11px;"><div style="font-weight:700;font-size:13px;">Government Client Relationships (IWAI, Ports)</div><div style="font-size:12px;color:var(--sec);">Long-standing relationships with IWAI (Inland Waterways Authority of India) and major port trusts. Repeat business from existing clients — 50%+ bid win rate demonstrates trust and execution track record.</div></div>
+</div>
+</div>
+<div class="card">
+<div style="display:flex;flex-direction:column;gap:12px;">
+<div style="border-left:3px solid var(--blue);padding-left:11px;"><div style="font-weight:700;font-size:13px;">Tonnage Tax — Structural Profitability Advantage</div><div style="font-size:12px;color:var(--sec);">New tonnage tax election reduces effective tax rate from 20-25% to below 1%. This is a permanent structural advantage under Indian shipping tax law. No competitor that hasn't made this election can match KMEW's net margin.</div></div>
+<div style="border-left:3px solid var(--amber);padding-left:11px;"><div style="font-weight:700;font-size:13px;">Shipbuilding Entry — New Vertical With Captive Demand</div><div style="font-size:12px;color:var(--sec);">KMEW can build vessels for its own fleet (reducing vessel acquisition cost) and for external clients (new revenue). Vertical integration of fleet ownership + construction is rare among Indian marine companies.</div></div>
+<div style="border-left:3px solid var(--amber);padding-left:11px;"><div style="font-weight:700;font-size:13px;">EBITDA Margin Discipline (35%+ Target)</div><div style="font-size:12px;color:var(--sec);">Management explicitly targets minimum 35% EBITDA margin on all bids. Selective bidding on premium contracts — refuses low-margin work that DCI might accept.</div></div>
+</div>
+</div>
+</div>
+</div><div class="db">&#9888; Data sourced from public sources. Not SEBI-registered investment advice.</div></div>
+
+<!-- TAB 3: INDUSTRY -->
+<div id="tab-3" class="tp"><div class="c">
+<div class="g3">
+<div class="kpi"><div class="kl">India Dredging Market</div><div class="kv" style="font-size:17px;">&#8377;8,000 Cr+</div><div class="ks">Est. annual. Growing ~15% CAGR</div></div>
+<div class="kpi"><div class="kl">IWAI Budget Allocation</div><div class="kv" style="font-size:17px;">&#8377;6,000 Cr+</div><div class="ks">FY26 annual; growing with Sagarmala</div></div>
+<div class="kpi"><div class="kl">India Shipbuilding Push</div><div class="kv" style="font-size:17px;">&#8377;10,000 Cr</div><div class="ks">Govt incentives &amp; green fleet mandate</div></div>
+</div>
+<div class="sec">Peer Comparison</div>
+<div class="tw card"><table>
+<thead><tr><th>Company</th><th>Type</th><th>Revenue (Cr)</th><th>EBITDA Margin</th><th>PE</th><th>Growth</th></tr></thead>
+<tbody>
+<tr class="tdhi"><td><strong>KMEW</strong></td><td>Private Marine Svcs</td><td class="mono">&#8377;236 (TTM)</td><td class="mono">40%</td><td class="mono">61x</td><td class="mono">53% 5Y CAGR</td></tr>
+<tr><td>Dredging Corp. India (DCI)</td><td>State-Owned</td><td class="mono">&#8377;1,800+</td><td class="mono">20%</td><td class="mono">18x</td><td class="mono">Low single digit</td></tr>
+<tr><td>Mercator Ltd</td><td>Shipping / Dredging</td><td class="mono">&#8377;1,200+</td><td class="mono">15%</td><td class="mono">---</td><td class="mono">Stressed</td></tr>
+<tr><td>Garware Technical Fibres</td><td>Marine adjacent</td><td class="mono">&#8377;1,500+</td><td class="mono">22%</td><td class="mono">28x</td><td class="mono">Moderate</td></tr>
+</tbody></table>
+<div style="padding:8px;font-size:12px;color:var(--muted);">KMEW commands a premium PE but justifies it through 5Y revenue CAGR of 53% and margin profile 2x+ the nearest peer. Tonnage tax now further widens the net margin gap.</div>
+</div>
+<div class="g2">
+<div class="card"><div class="sec">Industry Tailwinds</div>
+<div style="display:flex;flex-direction:column;gap:9px;">
+<div style="padding:9px;border-radius:6px;border-left:3px solid var(--green);background:var(--alt);"><div style="font-weight:700;font-size:13px;">Sagarmala Programme &amp; IWAI Budget Expansion</div><div style="font-size:12px;color:var(--sec);">India's Sagarmala programme targets &#8377;6+ lakh crore in port and waterway development. IWAI's annual budget growing; directly drives dredging and vessel demand.</div></div>
+<div style="padding:9px;border-radius:6px;border-left:3px solid var(--green);background:var(--alt);"><div style="font-weight:700;font-size:13px;">National Waterway Expansion (111 NWs)</div><div style="font-size:12px;color:var(--sec);">India has declared 111 National Waterways. Maintenance dredging on each creates recurring revenue for decades. KMEW's River Pearl fleet is built for exactly this segment.</div></div>
+<div style="padding:9px;border-radius:6px;border-left:3px solid var(--green);background:var(--alt);"><div style="font-weight:700;font-size:13px;">Green Tug Mandate</div><div style="font-size:12px;color:var(--sec);">India and global ports mandating replacement of diesel tugs with green (LNG/hydrogen/electric) alternatives. KMEW's &#8377;700 Cr green tug contract is front of this wave.</div></div>
+<div style="padding:9px;border-radius:6px;border-left:3px solid var(--green);background:var(--alt);"><div style="font-weight:700;font-size:13px;">Shipbuilding Incentive Policy</div><div style="font-size:12px;color:var(--sec);">Government incentivising domestic ship construction. KMEW's new shipyard positions it to capture IWAI's fleet replacement demand with Made-in-India vessels.</div></div>
+</div></div>
+<div class="card"><div class="sec">Industry Headwinds</div>
+<div style="display:flex;flex-direction:column;gap:9px;">
+<div style="padding:9px;border-radius:6px;border-left:3px solid var(--red);background:var(--alt);"><div style="font-weight:700;font-size:13px;">Government Budget Dependency</div><div style="font-size:12px;color:var(--sec);">80%+ revenue from government clients. Any IWAI budget cut, political change in priority, or tender delay directly impacts KMEW's revenue. Single biggest structural risk.</div></div>
+<div style="padding:9px;border-radius:6px;border-left:3px solid var(--red);background:var(--alt);"><div style="font-weight:700;font-size:13px;">DCI Competition on Large Projects</div><div style="font-size:12px;color:var(--sec);">DCI still has first-mover advantage on very large dredging projects. KMEW's fleet size limits it to mid-size projects; scaling fleet takes capital and time.</div></div>
+<div style="padding:9px;border-radius:6px;border-left:3px solid var(--amber);background:var(--alt);"><div style="font-weight:700;font-size:13px;">Rising Debt as Fleet Expands</div><div style="font-size:12px;color:var(--sec);">Borrowings grew from &#8377;60 Cr (FY24) to &#8377;133 Cr (FY25) to &#8377;146 Cr (Sep 25). Approved borrowing limit raised to &#8377;1,200 Cr. Interest cost is rising rapidly.</div></div>
+</div></div></div>
+</div><div class="db">&#9888; Data sourced from public sources. Not SEBI-registered investment advice.</div></div>
+
+<!-- TAB 4: FINANCIALS -->
+<div id="tab-4" class="tp"><div class="c">
+<div class="sec">P&amp;L — Annual Consolidated (&#8377; Crores)</div>
+<div class="tw card"><table>
+<thead><tr><th>Metric</th><th>FY19</th><th>FY20</th><th>FY21</th><th>FY22</th><th>FY23</th><th>FY24</th><th>FY25</th><th class="tdhi">TTM</th></tr></thead>
+<tbody>
+<tr><td><strong>Revenue</strong></td><td class="mono">11</td><td class="mono">24</td><td class="mono">33</td><td class="mono">61</td><td class="mono">202</td><td class="mono">164</td><td class="mono">201</td><td class="mono tdhi" style="color:var(--green);">236</td></tr>
+<tr><td><strong>EBITDA</strong></td><td class="mono">4</td><td class="mono">8</td><td class="mono">13</td><td class="mono">32</td><td class="mono">69</td><td class="mono">50</td><td class="mono">78</td><td class="mono tdhi" style="color:var(--green);">95</td></tr>
+<tr><td><strong>EBITDA%</strong></td><td class="mono">41%</td><td class="mono">32%</td><td class="mono">40%</td><td class="mono">53%</td><td class="mono">34%</td><td class="mono">30%</td><td class="mono">39%</td><td class="mono tdhi" style="color:var(--green);">40%</td></tr>
+<tr><td><strong>PAT</strong></td><td class="mono">3</td><td class="mono">5</td><td class="mono">7</td><td class="mono">21</td><td class="mono">48</td><td class="mono">31</td><td class="mono">50</td><td class="mono tdhi" style="color:var(--green);">66</td></tr>
+<tr><td><strong>EPS (&#8377;)</strong></td><td class="mono">3.8</td><td class="mono">9.1</td><td class="mono">3.2</td><td class="mono">9.9</td><td class="mono">22.0</td><td class="mono">14.1</td><td class="mono">23.0</td><td class="mono tdhi" style="color:var(--green);">27.9</td></tr>
+<tr><td><strong>Div. Payout</strong></td><td class="mono">0%</td><td class="mono">0%</td><td class="mono">0%</td><td class="mono">0%</td><td class="mono">0%</td><td class="mono">0%</td><td class="mono">0%</td><td class="mono tdhi">0%</td></tr>
+</tbody></table></div>
+<div class="g2" style="margin-top:14px;">
+<div class="card"><div class="sec">Revenue &amp; PAT Trend</div><div class="cw" style="height:240px;"><canvas id="kmRevChart"></canvas></div></div>
+<div class="card"><div class="sec">EBITDA Margin Trend</div><div class="cw" style="height:240px;"><canvas id="kmMarginChart"></canvas></div></div>
+</div>
+<div class="sec">Balance Sheet (&#8377; Crores)</div>
+<div class="tw card"><table>
+<thead><tr><th>Metric</th><th>FY21</th><th>FY22</th><th>FY23</th><th>FY24</th><th>FY25</th><th class="tdhi">Sep 25</th></tr></thead>
+<tbody>
+<tr><td>Equity Capital</td><td class="mono">10</td><td class="mono">10</td><td class="mono">11</td><td class="mono">11</td><td class="mono">11</td><td class="mono tdhi">11</td></tr>
+<tr><td>Reserves</td><td class="mono">17</td><td class="mono">37</td><td class="mono">123</td><td class="mono">157</td><td class="mono">207</td><td class="mono tdhi" style="color:var(--green);">229</td></tr>
+<tr><td>Borrowings</td><td class="mono">17</td><td class="mono">26</td><td class="mono">25</td><td class="mono">60</td><td class="mono">133</td><td class="mono tdhi" style="color:var(--amber);">146</td></tr>
+<tr><td>Fixed Assets</td><td class="mono">28</td><td class="mono">53</td><td class="mono">59</td><td class="mono">108</td><td class="mono">159</td><td class="mono tdhi">190</td></tr>
+<tr><td>CWIP</td><td class="mono">3</td><td class="mono">2</td><td class="mono">8</td><td class="mono">12</td><td class="mono">50</td><td class="mono tdhi" style="color:var(--amber);">27</td></tr>
+<tr><td>Total Assets</td><td class="mono">51</td><td class="mono">94</td><td class="mono">209</td><td class="mono">259</td><td class="mono">399</td><td class="mono tdhi">432</td></tr>
+</tbody></table></div>
+<div class="sec">Cash Flow &amp; Quarterly Results (&#8377; Crores)</div>
+<div class="g2">
+<div class="tw card"><table>
+<thead><tr><th>CF Metric</th><th>FY23</th><th>FY24</th><th class="tdhi">FY25</th></tr></thead>
+<tbody>
+<tr><td>CFO</td><td class="mono">21</td><td class="mono">34</td><td class="mono tdhi" style="color:var(--green);">58</td></tr>
+<tr><td>CFI</td><td class="mono">-23</td><td class="mono">-72</td><td class="mono tdhi" style="color:var(--red);">-127</td></tr>
+<tr><td>CFF</td><td class="mono">35</td><td class="mono">32</td><td class="mono tdhi">64</td></tr>
+<tr><td>CFO/PAT</td><td class="mono">0.44x</td><td class="mono">1.1x</td><td class="mono tdhi" style="color:var(--green);">1.16x</td></tr>
+</tbody></table></div>
+<div class="tw card"><table>
+<thead><tr><th>Quarter</th><th>Revenue</th><th>OPM%</th><th>PAT</th></tr></thead>
+<tbody>
+<tr><td>Jun 24</td><td class="mono">43</td><td class="mono">37%</td><td class="mono">10</td></tr>
+<tr><td>Sep 24</td><td class="mono">52</td><td class="mono">40%</td><td class="mono">13</td></tr>
+<tr><td>Dec 24</td><td class="mono">58</td><td class="mono">43%</td><td class="mono">16</td></tr>
+<tr><td>Mar 25</td><td class="mono">47</td><td class="mono">35%</td><td class="mono">11</td></tr>
+<tr><td>Jun 25</td><td class="mono">48</td><td class="mono">41%</td><td class="mono">11</td></tr>
+<tr><td>Sep 25</td><td class="mono">50</td><td class="mono">40%</td><td class="mono">12</td></tr>
+<tr class="tdhi"><td>Dec 25</td><td class="mono tdhi" style="color:var(--green);">90</td><td class="mono tdhi" style="color:var(--green);">43%</td><td class="mono tdhi" style="color:var(--green);">33</td></tr>
+</tbody></table></div>
+</div>
+</div><div class="db">&#9888; Data sourced from public sources. Not SEBI-registered investment advice.</div></div>
+
+<!-- TAB 5: GROWTH -->
+<div id="tab-5" class="tp"><div class="c">
+<div class="sec">CAGR Summary</div>
+<div class="tw card"><table>
+<thead><tr><th>Metric</th><th>3Y CAGR</th><th>5Y CAGR</th><th>TTM Growth</th></tr></thead>
+<tbody>
+<tr><td>Revenue</td><td class="mono" style="color:var(--green);">+49%</td><td class="mono" style="color:var(--green);">+53%</td><td class="mono" style="color:var(--green);">+22%</td></tr>
+<tr><td>PAT</td><td class="mono" style="color:var(--green);">+35%</td><td class="mono" style="color:var(--green);">+61%</td><td class="mono" style="color:var(--green);">+38%</td></tr>
+<tr><td>Stock Price</td><td class="mono" style="color:var(--green);">+46% (3Y)</td><td class="mono" style="color:var(--green);">---</td><td class="mono" style="color:var(--green);">+92% (1Y)</td></tr>
+</tbody></table></div>
+<div class="sec">Growth Triggers</div>
+<div class="tc hi"><div style="font-weight:700;font-size:14px;margin-bottom:5px;display:flex;align-items:center;gap:8px;"><span class="badge bh">HIGH</span>Tonnage Tax — Structural PAT Multiplier</div>
+<div style="font-size:13px;color:var(--sec);margin-bottom:6px;">The tonnage tax election reduces KMEW's effective tax rate from ~20% to below 1%. This is not a one-time event — it is a permanent structural change under Indian shipping tax law (Section 115V of the Income Tax Act). Every future rupee of EBITDA now converts to PAT at 98%+ efficiency. For FY27, assuming &#8377;130-140 Cr EBITDA, PAT could reach &#8377;120-135 Cr vs only &#8377;105 Cr that would have been achievable at 25% tax rate.</div>
+<div style="font-size:12px;color:var(--green);font-weight:600;">&#9650; Structural PAT uplift of 25%+ vs pre-tonnage-tax scenario — permanent.</div>
+<div style="font-size:12px;color:var(--red);margin-top:4px;">&#9660; Any change in tonnage tax scheme applicability by government would reverse this benefit.</div>
+</div>
+<div class="tc hi"><div style="font-weight:700;font-size:14px;margin-bottom:5px;display:flex;align-items:center;gap:8px;"><span class="badge bh">HIGH</span>&#8377;700 Cr Green Tug Contract (15-Year Revenue Lock-In)</div>
+<div style="font-size:13px;color:var(--sec);margin-bottom:6px;">A 15-year green tug contract is categorically different from KMEW's typical project contracts. It guarantees &#8377;40-50 Cr annual revenue for 15 years from a single contract — effectively &#8377;700 Cr total lifetime contract value with high visibility. Green tug contracts globally carry premium margins as operators pay up for regulatory compliance. This single contract transforms KMEW's earnings quality.</div>
+<div style="font-size:12px;color:var(--green);font-weight:600;">&#9650; &#8377;40-50 Cr guaranteed annual revenue for 15 years from one contract alone — high-margin, low-execution-risk.</div>
+<div style="font-size:12px;color:var(--red);margin-top:4px;">&#9660; Contract details and counterparty creditworthiness not fully disclosed — verify before building full base case on this.</div>
+</div>
+<div class="tc hi"><div style="font-weight:700;font-size:14px;margin-bottom:5px;display:flex;align-items:center;gap:8px;"><span class="badge bh">HIGH</span>Shipbuilding — &#8377;500-700 Cr Revenue Target in 3 Years</div>
+<div style="font-size:13px;color:var(--sec);margin-bottom:6px;">Entry into commercial shipbuilding via &#8377;230 Cr IWAI orders is just the opening position. Management is investing &#8377;100 Cr in shipyard infrastructure to target &#8377;500-700 Cr shipbuilding revenue within 3 years. IWAI's massive fleet replacement programme (105+ new vessels planned) is the captive demand base. KMEW can also build for its own fleet at lower-than-market cost.</div>
+<div style="font-size:12px;color:var(--green);font-weight:600;">&#9650; &#8377;500 Cr shipbuilding + &#8377;300 Cr dredging = &#8377;800 Cr potential revenue by FY29 on this trajectory.</div>
+<div style="font-size:12px;color:var(--red);margin-top:4px;">&#9660; Shipbuilding is technically complex; scaling execution without quality issues is a real risk for a company entering a new vertical.</div>
+</div>
+<div class="tc med"><div style="font-weight:700;font-size:14px;margin-bottom:5px;display:flex;align-items:center;gap:8px;"><span class="badge bm">MEDIUM</span>Order Book Execution — &#8377;1,500 Cr Backlog + &#8377;3,000 Cr Pipeline</div>
+<div style="font-size:13px;color:var(--sec);margin-bottom:6px;">With &#8377;1,500 Cr order book and &#8377;3,000+ Cr bid pipeline as of Q3 FY26, near-term revenue visibility is strong. The key question is execution pace — historically KMEW has executed well, with Q3 FY26 showing &#8377;90 Cr quarterly revenue as first evidence of order book monetisation acceleration.</div>
+<div style="font-size:12px;color:var(--green);font-weight:600;">&#9650; &#8377;1,500 Cr order book implies ~5-6 quarters of revenue at current run-rate — strong visibility.</div>
+<div style="font-size:12px;color:var(--red);margin-top:4px;">&#9660; Top 5 orders = 74% of book — concentration risk. Any one large order delay materially impacts quarterly numbers.</div>
+</div>
+<div class="tc opt"><div style="font-weight:700;font-size:14px;margin-bottom:5px;display:flex;align-items:center;gap:8px;"><span class="badge bo">OPTIONALITY</span>Bahrain Project &amp; International Expansion</div>
+<div style="font-size:13px;color:var(--sec);margin-bottom:6px;">KMEW secured Bahrain sand mining contract (operational pause currently) and is exploring cruise vessel operations. International diversification would reduce India government client concentration. Myanmar operations also provide geographic spread.</div>
+<div style="font-size:12px;color:var(--green);font-weight:600;">&#9650; International revenue at higher margins — pure upside if Bahrain resumes.</div>
+<div style="font-size:12px;color:var(--red);margin-top:4px;">&#9660; International projects carry execution, regulatory, and geopolitical complexity. Not in base case.</div>
+</div>
+</div><div class="db">&#9888; Data sourced from public sources. Not SEBI-registered investment advice.</div></div>
+
+<!-- TAB 6: FORENSICS -->
+<div id="tab-6" class="tp"><div class="c">
+<div class="g2">
+<div class="card"><div class="sec">Rating &amp; Auditor</div>
+<table>
+<tr><td style="color:var(--muted);font-size:12px;">CRISIL Rating</td><td>A-/Stable (Aug 2025)</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">CARE Rating</td><td>A-/Stable (Jul 2025)</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">Rating Trend</td><td style="color:var(--green);">Upgraded from BBB+ — positive trajectory</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">CFO FY25</td><td class="mono" style="color:var(--green);">&#8377;58 Cr (strong)</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">CFO/PAT FY25</td><td class="mono" style="color:var(--green);">1.16x — healthy</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">CWIP (Sep 25)</td><td class="mono" style="color:var(--amber);">&#8377;27 Cr — monitoring needed</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">Debtor Days</td><td class="mono" style="color:var(--red);">131 days (FY25) — rising from 106</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">D/E Ratio</td><td class="mono" style="color:var(--amber);">~0.62x (Sep 25) — manageable but rising</td></tr>
+</table>
+</div>
+<div class="card"><div class="sec">Overall Forensic Verdict</div>
+<div style="text-align:center;padding:14px 0;"><span class="badge bm" style="font-size:15px;padding:8px 22px;">&#9888; AMBER FLAGS</span></div>
+<div style="display:flex;flex-direction:column;gap:9px;margin-top:8px;">
+<div style="display:flex;gap:8px;"><span style="color:var(--red);font-size:14px;flex-shrink:0;">&#9888;</span><div style="font-size:13px;"><strong>Promoter Dilution -13.5% in 3Y:</strong> Promoter stake fell from 67.09% to 53.63% via preferential allotments. Funding fleet expansion through equity dilution. If crosses 50%, governance concern escalates.</div></div>
+<div style="display:flex;gap:8px;"><span style="color:var(--amber);font-size:14px;flex-shrink:0;">&#9888;</span><div style="font-size:13px;"><strong>Debtor Days Rising (131):</strong> Government clients are slow payers. Rising receivables with rapid revenue growth creates working capital strain. Must watch in FY27 as shipbuilding revenues add longer cycle receivables.</div></div>
+<div style="display:flex;gap:8px;"><span style="color:var(--amber);font-size:14px;flex-shrink:0;">&#9888;</span><div style="font-size:13px;"><strong>CWIP &#8377;50 Cr at FY25:</strong> High CWIP for a company of this size — fleet under construction and shipyard build-out. Declining to &#8377;27 Cr by Sep 25 is positive. Monitor capitalisation pace.</div></div>
+<div style="display:flex;gap:8px;"><span style="color:var(--amber);font-size:14px;flex-shrink:0;">&#9888;</span><div style="font-size:13px;"><strong>FCF Negative in 3 of 5 years:</strong> Aggressive capex for fleet expansion results in negative FCF despite PAT growth. This is appropriate for a growth-phase company but needs monitoring as fleet stabilises.</div></div>
+<div style="display:flex;gap:8px;"><span style="color:var(--green);font-size:14px;flex-shrink:0;">&#10003;</span><div style="font-size:13px;"><strong>CFO Healthy:</strong> FY25 CFO &#8377;58 Cr with CFO/PAT of 1.16x — shows the underlying business generates real cash. Collections from government ultimately happen, just with delay.</div></div>
+<div style="display:flex;gap:8px;"><span style="color:var(--green);font-size:14px;flex-shrink:0;">&#10003;</span><div style="font-size:13px;"><strong>Credit Ratings Improving:</strong> CRISIL and CARE both upgraded to A-/Stable in 2025. Positive credit trajectory validates financial discipline.</div></div>
+</div></div></div>
+</div><div class="db">&#9888; Data sourced from public sources. Not SEBI-registered investment advice.</div></div>
+
+<!-- TAB 7: VALUATION -->
+<div id="tab-7" class="tp"><div class="c">
+<div class="sec">PE Context</div>
+<div class="card">
+<div class="cw" style="height:240px;"><canvas id="kmPEChart"></canvas></div>
+<div style="font-size:13px;margin-top:12px;padding:10px;background:var(--alt);border-radius:6px;">At 61x TTM PE, KMEW looks expensive vs traditional benchmarks. But this needs to be viewed through the lens of: (a) 53% 5Y revenue CAGR, (b) tonnage tax reducing effective rate to near-zero (so forward PE on normalised PAT is ~40x), and (c) &#8377;1,500 Cr order book providing revenue visibility. Comparable marine/infrastructure growth companies in India (like Mazagon Dock at 55x, COCHIN Shipyard at 40x) validate the premium. The right question is not "is it expensive?" but "will the growth sustain to justify the valuation?"</div>
+</div>
+<div class="sec">Bear / Base / Bull Scenarios</div>
+<div class="tw card"><table>
+<thead><tr><th>Scenario</th><th>FY27E Revenue</th><th>FY27E PAT</th><th>FY27E EPS</th><th>PE</th><th>Target</th><th>Upside/Downside</th></tr></thead>
+<tbody>
+<tr><td style="color:var(--red);font-weight:700;">Bear</td><td class="mono">&#8377;250 Cr</td><td class="mono">&#8377;60 Cr</td><td class="mono">&#8377;25.3</td><td class="mono">43x</td><td class="mono" style="color:var(--red);">&#8377;1,090</td><td class="mono" style="color:var(--red);">-37%</td></tr>
+<tr><td style="color:var(--amber);font-weight:700;">Base</td><td class="mono">&#8377;350 Cr</td><td class="mono">&#8377;115 Cr</td><td class="mono">&#8377;48.5</td><td class="mono">45x</td><td class="mono" style="color:var(--amber);">&#8377;2,183</td><td class="mono" style="color:var(--amber);">+25%</td></tr>
+<tr><td style="color:var(--green);font-weight:700;">Bull</td><td class="mono">&#8377;420 Cr</td><td class="mono">&#8377;150 Cr</td><td class="mono">&#8377;63.3</td><td class="mono">50x</td><td class="mono" style="color:var(--green);">&#8377;3,165</td><td class="mono" style="color:var(--green);">+82%</td></tr>
+</tbody></table>
+<div style="padding:8px;font-size:12px;color:var(--muted);">Base case assumes: &#8377;350 Cr FY27 revenue (+48% on Q3 FY26 run-rate annualised), tonnage tax at &lt;1% effective rate, &#8377;183 Cr capex programme executing. PAT jumps to &#8377;115 Cr from &#8377;66 Cr TTM because tax savings add ~&#8377;25-30 Cr. EPS &#8377;48.5 on 2.37 Cr shares.</div>
+</div>
+</div><div class="db">&#9888; Data sourced from public sources. Not SEBI-registered investment advice.</div></div>
+
+<!-- TAB 8: THESIS -->
+<div id="tab-8" class="tp"><div class="c">
+<div class="card" style="margin-bottom:16px;"><div class="sec">Investment Thesis</div>
+<div style="font-size:14px;line-height:1.8;">
+<p style="margin-bottom:12px;"><strong>Why KMEW?</strong> KMEW is the rare combination of structural sector tailwind (India's waterway and port infrastructure buildout) + operational excellence (40%+ EBITDA margins vs industry average of 20%) + financial engineering (tonnage tax turning effective tax rate to near-zero) all arriving simultaneously. The company has compounded revenue at 53% CAGR for 5 years — one of the highest in India's listed infrastructure universe — and is now entering its next growth phase via commercial shipbuilding.</p>
+<p style="margin-bottom:12px;"><strong>Why Now?</strong> Three catalysts are converging in FY26-27: (1) Tonnage tax election that permanently improves net margins; (2) &#8377;700 Cr green tug contract providing 15-year revenue certainty; and (3) entry into commercial shipbuilding just as IWAI launches a massive vessel procurement programme. The Q3 FY26 quarter (&#8377;90 Cr revenue, &#8377;33 Cr PAT, PAT margin 37%!) is the first data point showing this convergence in financial results. FII entry to 11% in December 2025 confirms institutional recognition of the same thesis.</p>
+<p style="margin-bottom:12px;"><strong>What Is the Market Missing?</strong> The market is focused on the historical PE of 61x and questioning the valuation. What it is not fully pricing is the forward PAT trajectory with tonnage tax. At 1% effective tax rate on &#8377;140 Cr FY27E EBITDA, PAT could be &#8377;120-130 Cr — implying the stock is trading at only 32-34x forward earnings. For a company growing revenue at 40-50% with improving margins and a locked 15-year revenue contract, this is attractive.</p>
+<p><strong>The constraint:</strong> This is a small-cap with 2.37 Cr shares outstanding — very limited liquidity. The 53.6% promoter stake provides reasonable comfort, but the continuous dilution trend (from 67% to 53%) warrants monitoring. Government client concentration (80%+ from government entities) means any policy slowdown hits immediately.</p>
+</div></div>
+<div class="sec">Key Monitorables</div>
+<div class="card">
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1.5fr;gap:8px;padding:8px 0;border-bottom:2px solid var(--sep);font-weight:700;font-size:11px;text-transform:uppercase;color:var(--muted);"><div>Metric</div><div>Target</div><div>Frequency</div><div>Red Flag</div></div>
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1.5fr;gap:8px;padding:9px 0;border-bottom:1px solid var(--sep);font-size:13px;"><div><strong>Quarterly Revenue</strong></div><div class="mono">&gt;&#8377;75 Cr</div><div>Quarterly</div><div style="color:var(--red);">Below &#8377;50 Cr (order delay signal)</div></div>
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1.5fr;gap:8px;padding:9px 0;border-bottom:1px solid var(--sep);font-size:13px;"><div><strong>EBITDA Margin</strong></div><div class="mono">&gt;35%</div><div>Quarterly</div><div style="color:var(--red);">Below 30% (pricing power loss)</div></div>
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1.5fr;gap:8px;padding:9px 0;border-bottom:1px solid var(--sep);font-size:13px;"><div><strong>Order Book</strong></div><div class="mono">&gt;&#8377;1,200 Cr</div><div>Quarterly</div><div style="color:var(--red);">Below &#8377;800 Cr (growth stalling)</div></div>
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1.5fr;gap:8px;padding:9px 0;border-bottom:1px solid var(--sep);font-size:13px;"><div><strong>Promoter Stake</strong></div><div class="mono">&gt;50%</div><div>Quarterly</div><div style="color:var(--red);">Below 50% (governance threshold)</div></div>
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1.5fr;gap:8px;padding:9px 0;font-size:13px;"><div><strong>Debtor Days</strong></div><div class="mono">&lt;150</div><div>Annual</div><div style="color:var(--red);">Above 200 (collection crisis)</div></div>
+</div>
+<div style="text-align:center;margin-top:20px;"><span class="bbuy" style="font-size:16px;padding:10px 28px;border-radius:30px;">BUY &mdash; 8/10 Conviction &mdash; 12M Target &#8377;2,200 | 2Y Target &#8377;2,800</span></div>
+</div><div class="db">&#9888; Data sourced from public sources. Not SEBI-registered investment advice.</div></div>
+
+<!-- TAB 9: RISKS -->
+<div id="tab-9" class="tp"><div class="c">
+<div class="sec">Risk Matrix</div>
+<div class="tw card"><table>
+<thead><tr><th>Risk</th><th>Category</th><th>Prob.</th><th>Impact</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr><td><strong>IWAI budget cut / tender delays</strong></td><td>Client</td><td><span class="badge bm">MED</span></td><td><span class="badge bh">HIGH</span></td><td>Order book diversification across IWAI, ports, Bahrain. 15Y green tug provides anchor.</td></tr>
+<tr><td><strong>Promoter dilution below 50%</strong></td><td>Governance</td><td><span class="badge bm">MED</span></td><td><span class="badge bm">MED</span></td><td>Monitor quarterly. Currently at 53.6% — one more equity raise could breach 50%.</td></tr>
+<tr><td><strong>Debtor days spike (&gt;180)</strong></td><td>Financial</td><td><span class="badge bm">MED</span></td><td><span class="badge bm">MED</span></td><td>Government clients ultimately pay — but liquidity strain could delay fleet expansion.</td></tr>
+<tr><td><strong>Debt rising (&#8377;1,200 Cr limit approved)</strong></td><td>Financial</td><td><span class="badge bm">MED</span></td><td><span class="badge bm">MED</span></td><td>Interest coverage currently healthy; revenue must grow to support debt service.</td></tr>
+<tr><td><strong>Shipbuilding execution risk</strong></td><td>Execution</td><td><span class="badge bm">MED</span></td><td><span class="badge bm">MED</span></td><td>New vertical; track record unproven. First IWAI vessels will be key quality test.</td></tr>
+<tr><td><strong>Order concentration (top 5 = 74%)</strong></td><td>Client</td><td><span class="badge bl">LOW</span></td><td><span class="badge bh">HIGH</span></td><td>Any single large order delay materially impacts quarterly results. Diversify bid base.</td></tr>
+<tr><td><strong>Tonnage tax reversal</strong></td><td>Regulatory</td><td><span class="badge bl">LOW</span></td><td><span class="badge bm">MED</span></td><td>Established law (Sec 115V). Would require legislative change. Not a near-term risk.</td></tr>
+<tr><td><strong>Green tug contract counterparty risk</strong></td><td>Contract</td><td><span class="badge bl">LOW</span></td><td><span class="badge bh">HIGH</span></td><td>15-year contract depends on counterparty. Verify creditworthiness of contracting party.</td></tr>
+</tbody></table></div>
+</div><div class="db">&#9888; Data sourced from public sources. Not SEBI-registered investment advice.</div></div>
+
+<!-- TAB 10: CONCALL -->
+<div id="tab-10" class="tp"><div class="c">
+<div class="cc">
+<div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+<span style="font-weight:700;font-size:14px;">Q3 FY26 Concall</span>
+<span style="color:var(--muted);font-size:12px;">February 19, 2026</span>
+<span class="badge bl">CONFIDENT</span>
+</div>
+<div class="sec">Key Guidance &amp; Highlights</div>
+<div class="tw"><table>
+<thead><tr><th>Item</th><th>Details</th><th>Assessment</th></tr></thead>
+<tbody>
+<tr><td>Q3 FY26 Revenue</td><td class="mono">&#8377;90 Cr (+56% YoY)</td><td style="color:var(--green);">&#10003; Breakthrough quarter</td></tr>
+<tr><td>Q3 OPM</td><td class="mono">43%</td><td style="color:var(--green);">&#10003; Expanding margins</td></tr>
+<tr><td>Q3 PAT</td><td class="mono">&#8377;33 Cr (vs &#8377;16 Cr Q3 FY25)</td><td style="color:var(--green);">&#10003; +106% YoY PAT</td></tr>
+<tr><td>Effective Tax Rate (Q3)</td><td class="mono">&lt;1% (tonnage tax)</td><td style="color:var(--green);">&#10003; Structural improvement</td></tr>
+<tr><td>Order Book</td><td class="mono">&#8377;1,500 Cr</td><td style="color:var(--green);">&#10003; Strong visibility</td></tr>
+<tr><td>Bid Pipeline</td><td class="mono">&gt;&#8377;3,000 Cr</td><td style="color:var(--green);">&#10003; Robust demand environment</td></tr>
+<tr><td>Shipbuilding Entry</td><td>&#8377;230 Cr IWAI orders secured</td><td style="color:var(--green);">&#10003; New revenue vertical active</td></tr>
+<tr><td>Green Tug Contract</td><td>&#8377;700 Cr+ 15-year contract</td><td style="color:var(--green);">&#10003; Landmark long-duration revenue</td></tr>
+<tr><td>Shipyard Investment Plan</td><td class="mono">&#8377;100 Cr</td><td style="color:var(--amber);">&#8594; Revenue target &#8377;500-700 Cr in 3Y</td></tr>
+<tr><td>Fleet Capex (3Y)</td><td class="mono">&#8377;183 Cr</td><td style="color:var(--amber);">&#8594; Borrowing limit raised to &#8377;1,200 Cr</td></tr>
+<tr><td>Bahrain Project</td><td>Currently paused</td><td style="color:var(--amber);">&#8594; Operational pause — watch</td></tr>
+<tr><td>Cruise Services</td><td>Entering via partnerships</td><td style="color:var(--bo);">&#128309; New optionality</td></tr>
+</tbody></table></div>
+<div style="margin-top:12px;padding:10px;border-radius:6px;background:var(--hi);font-size:12px;"><strong>Management Tone: HIGHLY CONFIDENT.</strong> Q3 FY26 is the most significant quarter in KMEW's listed history. Revenue, OPM, PAT all at records. Three major strategic announcements in one quarter (shipbuilding entry, green tug contract, tonnage tax). Management explicitly guiding &#8377;500-700 Cr shipbuilding revenue within 3 years — ambitious but backed by IWAI demand pipeline.</div>
+</div>
+</div><div class="db">&#9888; Data sourced from public sources. Not SEBI-registered investment advice.</div></div>
+
+<!-- TAB 11: CAP. ALLOC. -->
+<div id="tab-11" class="tp"><div class="c">
+<div class="g2">
+<div class="card"><div class="sec">Capex &amp; CFO Trend (&#8377; Crores)</div><div class="cw" style="height:220px;"><canvas id="kmCapexChart"></canvas></div></div>
+<div class="card"><div class="sec">D/E Ratio Trend</div><div class="cw" style="height:220px;"><canvas id="kmDeChart"></canvas></div></div>
+</div>
+<div class="sec">Capital Allocation Assessment</div>
+<div class="g2">
+<div class="card">
+<div style="display:flex;flex-direction:column;gap:10px;">
+<div style="display:flex;gap:8px;"><span style="color:var(--green);">&#10003;</span><div style="font-size:13px;"><strong>CFO/PAT improving:</strong> FY25 CFO &#8377;58 Cr on PAT &#8377;50 Cr — 1.16x ratio shows solid cash conversion. Underlying business generates real cash even in growth phase.</div></div>
+<div style="display:flex;gap:8px;"><span style="color:var(--green);">&#10003;</span><div style="font-size:13px;"><strong>All profits reinvested:</strong> Zero dividend payout since inception. Every rupee of PAT invested in fleet expansion — appropriate at this stage of growth. ROCE at 24.7% justifies reinvestment.</div></div>
+<div style="display:flex;gap:8px;"><span style="color:var(--green);">&#10003;</span><div style="font-size:13px;"><strong>Revenue per rupee of capital deployed:</strong> Asset turnover improving. Fleet generating &#8377;236 Cr revenue on &#8377;399 Cr total assets — 0.59x asset turn is decent for capital-intensive marine operations.</div></div>
+</div>
+</div>
+<div class="card">
+<div style="display:flex;flex-direction:column;gap:10px;">
+<div style="display:flex;gap:8px;"><span style="color:var(--red);">&#10007;</span><div style="font-size:13px;"><strong>FCF negative 3 of 5 years:</strong> Capex consistently exceeds CFO. This is appropriate given fleet expansion but watch debt levels. &#8377;1,200 Cr approved borrowing limit signals very aggressive expansion phase ahead.</div></div>
+<div style="display:flex;gap:8px;"><span style="color:var(--red);">&#10007;</span><div style="font-size:13px;"><strong>Equity dilution for growth funding:</strong> &#8377;284.81 Cr preferential allotment in Sep 2025. Promoter diluted. Future equity raises likely as capex continues. EPS growth could be muted despite strong PAT growth.</div></div>
+<div style="display:flex;gap:8px;"><span style="color:var(--amber);">&#8594;</span><div style="font-size:13px;"><strong>Debt rising but manageable:</strong> D/E at ~0.62x (Sep 25). With &#8377;1,200 Cr borrowing limit, theoretical D/E could reach 5x+ — but equity is also growing. Management needs to demonstrate discipline in debt utilisation.</div></div>
+</div>
+</div>
+</div>
+</div><div class="db">&#9888; Data sourced from public sources. Not SEBI-registered investment advice.</div></div>
+
+<!-- TAB 12: OWNERSHIP -->
+<div id="tab-12" class="tp"><div class="c">
+<div class="g2">
+<div class="card"><div class="sec">Promoter Shareholding Trend (%)</div><div class="cw" style="height:220px;"><canvas id="kmPromChart"></canvas></div></div>
+<div class="card"><div class="sec">FII &amp; DII Trend (%)</div><div class="cw" style="height:220px;"><canvas id="kmFDChart"></canvas></div></div>
+</div>
+<div class="sec">Shareholding Pattern — Quarterly (%)</div>
+<div class="tw card"><table>
+<thead><tr><th>Category</th><th>Dec22</th><th>Mar24</th><th>Sep24</th><th>Dec24</th><th>Mar25</th><th>Jun25</th><th>Sep25</th><th class="tdhi">Dec25</th></tr></thead>
+<tbody>
+<tr><td><strong>Promoters</strong></td><td class="mono">67.09</td><td class="mono">60.61</td><td class="mono">60.66</td><td class="mono">60.69</td><td class="mono">60.69</td><td class="mono">60.69</td><td class="mono">60.69</td><td class="mono tdhi" style="color:var(--red);">53.63</td></tr>
+<tr><td><strong>FIIs</strong></td><td class="mono">0.60</td><td class="mono">1.20</td><td class="mono">1.03</td><td class="mono">0.82</td><td class="mono">0.61</td><td class="mono">0.48</td><td class="mono">0.74</td><td class="mono tdhi" style="color:var(--green);">11.00</td></tr>
+<tr><td><strong>DIIs</strong></td><td class="mono">0.00</td><td class="mono">2.18</td><td class="mono">2.85</td><td class="mono">2.24</td><td class="mono">1.92</td><td class="mono">0.15</td><td class="mono">0.15</td><td class="mono tdhi">0.46</td></tr>
+<tr><td><strong>Public</strong></td><td class="mono">32.32</td><td class="mono">36.01</td><td class="mono">35.46</td><td class="mono">36.26</td><td class="mono">36.78</td><td class="mono">38.67</td><td class="mono">38.41</td><td class="mono tdhi">34.92</td></tr>
+<tr><td style="color:var(--muted);font-size:12px;">Shareholders</td><td class="mono">845</td><td class="mono">2,168</td><td class="mono">2,345</td><td class="mono">3,949</td><td class="mono">4,513</td><td class="mono">6,006</td><td class="mono">7,503</td><td class="mono tdhi">13,168</td></tr>
+</tbody></table></div>
+<div class="sec">Ownership Quality Commentary</div>
+<div class="g2">
+<div class="card">
+<div style="display:flex;flex-direction:column;gap:10px;">
+<div style="border-left:3px solid var(--red);padding-left:10px;"><div style="font-weight:700;font-size:13px;">Promoter Dilution — Watch Level</div><div style="font-size:12px;color:var(--sec);">From 67% to 53.6% in 3 years via preferential allotments to fund fleet expansion. Dropped 7.06% in just the last quarter (Sep&#8594;Dec 25 from 60.69% to 53.63%). One more large allotment could breach 50% — a governance red line.</div></div>
+</div>
+</div>
+<div class="card">
+<div style="display:flex;flex-direction:column;gap:10px;">
+<div style="border-left:3px solid var(--green);padding-left:10px;"><div style="font-weight:700;font-size:13px;">FII Entry to 11% — Major Institutional Vote of Confidence</div><div style="font-size:12px;color:var(--sec);">FII shareholding jumped from 0.74% (Sep 25) to 11.00% (Dec 25) — a 10.26% increase in one quarter. This is a landmark institutional entry, likely from a large global emerging market fund. Shareholder count jumped from 845 (Dec 22) to 13,168 (Dec 25) — widening investor base confirms rising institutional interest.</div></div>
+</div>
+</div>
+</div>
+</div><div class="db">&#9888; Data sourced from public sources. Not SEBI-registered investment advice.</div></div>
+
+<!-- TAB 13: EVENTS -->
+<div id="tab-13" class="tp"><div class="c">
+<div class="sec">Event Timeline</div>
+<div class="tw card"><table>
+<thead><tr><th>Date</th><th>Type</th><th>Headline</th><th>Impact</th></tr></thead>
+<tbody>
+<tr><td>Mar 2026</td><td><span class="badge bm">CORPORATE</span></td><td>Shareholders approve &#8377;1,200 Cr borrowing limit increase</td><td>Enables massive fleet and shipyard expansion. Signals aggressive growth phase.</td></tr>
+<tr><td>Feb 2026</td><td><span class="badge bl">CONCALL</span></td><td>Q3 FY26 earnings call held; transcript published Feb 25, 2026</td><td>Bullish management commentary on shipbuilding, order book, and tonnage tax.</td></tr>
+<tr><td>Q3 FY26 (Dec 25)</td><td><span class="badge bh">RESULTS</span></td><td>Revenue &#8377;90 Cr (+56% YoY), PAT &#8377;33 Cr (+106% YoY) — breakthrough quarter</td><td>Demonstrates commercial shipbuilding contribution and tonnage tax impact. Record PAT margin 37%.</td></tr>
+<tr><td>Q3 FY26</td><td><span class="badge bh">CONTRACT</span></td><td>&#8377;700 Cr+ green tug contract secured (15-year)</td><td>Largest and longest contract in KMEW history. Changes earnings visibility permanently.</td></tr>
+<tr><td>Q3 FY26</td><td><span class="badge bh">STRATEGY</span></td><td>Commercial shipbuilding entry — &#8377;230 Cr IWAI orders secured</td><td>New revenue vertical launched. KMEW now dredger + ship operator + shipbuilder.</td></tr>
+<tr><td>Q3 FY26</td><td><span class="badge bh">TAX</span></td><td>Tonnage tax scheme elected — effective rate below 1%</td><td>Permanent structural improvement to net profitability. Most impactful single financial decision.</td></tr>
+<tr><td>Dec 2025</td><td><span class="badge bl">OWNERSHIP</span></td><td>FII holding jumps to 11% (from 0.74% in Sep 25)</td><td>Major global institutional entry validates investment thesis. Significant re-rating catalyst.</td></tr>
+<tr><td>Sep 2025</td><td><span class="badge bm">CAPITAL</span></td><td>&#8377;284.81 Cr raised via preferential share issue</td><td>Fleet expansion funded. Promoter diluted to 60.69%.</td></tr>
+<tr><td>H1 FY26</td><td><span class="badge bl">ORDERS</span></td><td>7 orders worth &#8377;968.69 Cr won — IWAI, Deendayal Port, Bahrain sand mining</td><td>Strong order inflows building the &#8377;1,500 Cr backlog.</td></tr>
+</tbody></table></div>
+<div class="sec">Upcoming Catalysts</div>
+<div class="g3">
+<div class="card" style="padding:13px;border-left:4px solid var(--orange);"><div style="font-weight:700;font-size:13px;">Q4 FY26 Results</div><div style="font-size:12px;color:var(--muted);margin-top:3px;">Will Q3's &#8377;90 Cr revenue sustain? If yes, FY26 full-year revenue &#8377;280+ Cr — confirms the step-change. Critical validation quarter.</div></div>
+<div class="card" style="padding:13px;border-left:4px solid var(--green);"><div style="font-weight:700;font-size:13px;">First Shipbuilding Delivery</div><div style="font-size:12px;color:var(--muted);margin-top:3px;">First IWAI vessel delivered on time would prove shipbuilding capability. Quality and timeline execution will determine whether further orders follow.</div></div>
+<div class="card" style="padding:13px;border-left:4px solid var(--green);"><div style="font-weight:700;font-size:13px;">Promoter Stake Watch</div><div style="font-size:12px;color:var(--muted);margin-top:3px;">Monitor quarterly. At 53.6% — any further allotment below 51% is the governance red line. Must hold above 50%.</div></div>
+<div class="card" style="padding:13px;border-left:4px solid var(--blue);"><div style="font-weight:700;font-size:13px;">FII Stake Evolution</div><div style="font-size:12px;color:var(--muted);margin-top:3px;">11% FII at Dec 25 — further increase confirms institutional buy-in. Decrease would signal thesis re-evaluation by funds.</div></div>
+<div class="card" style="padding:13px;border-left:4px solid var(--amber);"><div style="font-weight:700;font-size:13px;">Bahrain Project Restart</div><div style="font-size:12px;color:var(--muted);margin-top:3px;">Operational pause currently. Restart would add international diversification and margin-accretive revenue. Pure upside catalyst.</div></div>
+<div class="card" style="padding:13px;border-left:4px solid var(--amber);"><div style="font-weight:700;font-size:13px;">Order Book Update</div><div style="font-size:12px;color:var(--muted);margin-top:3px;">&#8377;3,000+ Cr bid pipeline — conversion rate is the key metric. Track order wins per quarter for demand signal.</div></div>
+</div>
+</div><div class="db">&#9888; Data sourced from public sources (Screener.in, BSE, Whalesbook, DredgeWire, Tickertape). Not SEBI-registered investment advice. Research date: April 27, 2026.</div></div>
 
 <script>
-'use strict';
-const panels={snapshot:'p-snapshot',triggers:'p-triggers',priced:'p-priced',scorecard:'p-scorecard',valuation:'p-valuation'};
-const navIds={snapshot:'n-snapshot',triggers:'n-triggers',priced:'n-priced',scorecard:'n-scorecard',valuation:'n-valuation'};
-function sw(name,el){
-  Object.values(panels).forEach(id=>{const p=document.getElementById(id);if(p)p.classList.toggle('on',id===panels[name]);});
-  document.querySelectorAll('.ntab,.ttab').forEach(t=>t.classList.remove('on'));
-  const nb=document.getElementById(navIds[name]);if(nb)nb.classList.add('on');
-  if(el)el.classList.add('on');
-  document.querySelectorAll('.ttab').forEach(t=>{if(t.getAttribute('onclick')?.includes("'"+name+"'"))t.classList.add('on');});
-  window.scrollTo({top:0,behavior:'smooth'});
+function tc(){return document.documentElement.getAttribute('data-theme')==='dark'?'#CBD5E1':'#374151';}
+function toggleTheme(){const h=document.documentElement;h.setAttribute('data-theme',h.getAttribute('data-theme')==='dark'?'light':'dark');rbc();}
+const tbs=document.querySelectorAll('.tb');
+function showTab(n){document.querySelectorAll('.tp').forEach((p,i)=>p.classList.toggle('active',i===n));tbs.forEach((b,i)=>b.classList.toggle('active',i===n));window.scrollTo({top:0,behavior:'smooth'});}
+let charts=[];
+function dch(){charts.forEach(c=>{try{c.destroy();}catch(e){}});charts=[];}
+function rbc(){dch();setTimeout(bc,60);}
+function bc(){
+Chart.defaults.font.size=13;Chart.defaults.color=tc();
+const gc='rgba(100,116,139,0.15)';
+const pie=document.getElementById('kmPieChart');
+if(pie){charts.push(new Chart(pie,{type:'doughnut',data:{labels:['Dredging','Ship Chartering','Shipbuilding','Marine Infra'],datasets:[{data:[55,25,15,5],backgroundColor:['#0F1F3D','#E8701A','#16A34A','#6B7280'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11},color:tc(),boxWidth:12}}}}}))}
+const rv=document.getElementById('kmRevChart');
+if(rv){const yrs=['FY19','FY20','FY21','FY22','FY23','FY24','FY25','TTM'];const rev=[11,24,33,61,202,164,201,236];const pat=[3,5,7,21,48,31,50,66];charts.push(new Chart(rv,{type:'bar',data:{labels:yrs,datasets:[{label:'Revenue',data:rev,backgroundColor:'rgba(15,31,61,0.7)',yAxisID:'y'},{label:'PAT',data:pat,type:'line',borderColor:'#E8701A',backgroundColor:'rgba(232,112,26,0.1)',yAxisID:'y1',tension:0.3,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tc(),font:{size:11}}}},scales:{x:{ticks:{color:tc()},grid:{display:false}},y:{ticks:{color:tc()},grid:{color:gc},title:{display:true,text:'Rev (Cr)',color:tc()}},y1:{position:'right',ticks:{color:tc()},grid:{display:false},title:{display:true,text:'PAT (Cr)',color:tc()}}}}}))}
+const mg=document.getElementById('kmMarginChart');
+if(mg){const mdata=[41,32,40,53,34,30,39,40];charts.push(new Chart(mg,{type:'bar',data:{labels:['FY19','FY20','FY21','FY22','FY23','FY24','FY25','TTM'],datasets:[{label:'EBITDA %',data:mdata,backgroundColor:mdata.map(v=>v>38?'rgba(22,163,74,0.75)':'rgba(15,31,61,0.65)'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tc()}}},scales:{x:{ticks:{color:tc()},grid:{display:false}},y:{ticks:{color:tc(),callback:v=>v+'%'},grid:{color:gc},min:20,max:60}}}}))}
+const pe=document.getElementById('kmPEChart');
+if(pe){charts.push(new Chart(pe,{type:'line',data:{labels:['FY22','FY23','FY24','FY25','TTM'],datasets:[{label:'Trailing PE',data:[120,40,55,70,61],borderColor:'#E8701A',tension:0.4,pointRadius:5,fill:false},{label:'Peer Avg (35x)',data:[35,35,35,35,35],borderColor:'#16A34A',borderDash:[5,5],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tc()}}},scales:{x:{ticks:{color:tc()},grid:{display:false}},y:{ticks:{color:tc(),callback:v=>v+'x'},grid:{color:gc}}}}}))}
+const cx=document.getElementById('kmCapexChart');
+if(cx){charts.push(new Chart(cx,{type:'bar',data:{labels:['FY21','FY22','FY23','FY24','FY25'],datasets:[{label:'CFO',data:[5,35,21,34,58],backgroundColor:'rgba(22,163,74,0.7)',borderRadius:3},{label:'Capex',data:[4,31,23,72,127],backgroundColor:'rgba(220,38,38,0.7)',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tc()}}},scales:{x:{ticks:{color:tc()},grid:{display:false}},y:{ticks:{color:tc()},grid:{color:gc}}}}}))}
+const de=document.getElementById('kmDeChart');
+if(de){charts.push(new Chart(de,{type:'line',data:{labels:['FY21','FY22','FY23','FY24','FY25','Sep25'],datasets:[{label:'D/E Ratio',data:[1.0,0.7,0.2,0.38,0.64,0.64],borderColor:'#E8701A',backgroundColor:'rgba(232,112,26,0.1)',tension:0.3,pointRadius:4,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tc()}}},scales:{x:{ticks:{color:tc()},grid:{display:false}},y:{ticks:{color:tc()},grid:{color:gc},min:0,max:1.2}}}}))}
+const pr=document.getElementById('kmPromChart');
+if(pr){charts.push(new Chart(pr,{type:'line',data:{labels:['Dec22','Mar24','Sep24','Dec24','Mar25','Jun25','Sep25','Dec25'],datasets:[{label:'Promoter %',data:[67.09,60.61,60.66,60.69,60.69,60.69,60.69,53.63],borderColor:'#E8701A',backgroundColor:'rgba(232,112,26,0.1)',tension:0.2,pointRadius:4,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tc()}}},scales:{x:{ticks:{color:tc(),font:{size:9},maxRotation:45},grid:{display:false}},y:{ticks:{color:tc(),callback:v=>v+'%'},grid:{color:gc},min:45,max:72}}}}))}
+const fd=document.getElementById('kmFDChart');
+if(fd){charts.push(new Chart(fd,{type:'bar',data:{labels:['Dec22','Mar24','Sep24','Dec24','Mar25','Jun25','Sep25','Dec25'],datasets:[{label:'FII %',data:[0.60,1.20,1.03,0.82,0.61,0.48,0.74,11.00],backgroundColor:'rgba(29,78,216,0.7)',borderRadius:3},{label:'DII %',data:[0.00,2.18,2.85,2.24,1.92,0.15,0.15,0.46],backgroundColor:'rgba(22,163,74,0.7)',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tc()}}},scales:{x:{ticks:{color:tc(),font:{size:9}},grid:{display:false}},y:{ticks:{color:tc(),callback:v=>v+'%'},grid:{color:gc}}}}}))}
 }
-function toggleTc(id){const el=document.getElementById(id);if(el)el.classList.toggle('open');}
+document.addEventListener('DOMContentLoaded',bc);
 </script>
-</body>
-</html>
+</body></html>
